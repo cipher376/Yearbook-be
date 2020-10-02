@@ -1,0 +1,79 @@
+{
+  "name": "almata-be",
+  "version": "1.0.0",
+  "description": "Backend api for the Alma-mata project by Devtek",
+  "keywords": [
+    "loopback-application",
+    "loopback"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "engines": {
+    "node": ">=10.16"
+  },
+  "scripts": {
+    "build": "lb-tsc",
+    "build:watch": "lb-tsc --watch",
+    "lint": "npm run prettier:check && npm run eslint",
+    "lint:fix": "npm run eslint:fix && npm run prettier:fix",
+    "prettier:cli": "lb-prettier \"**/*.ts\" \"**/*.js\"",
+    "prettier:check": "npm run prettier:cli -- -l",
+    "prettier:fix": "npm run prettier:cli -- --write",
+    "eslint": "lb-eslint --report-unused-disable-directives .",
+    "eslint:fix": "npm run eslint -- --fix",
+    "pretest": "npm run clean && npm run build",
+    "test": "lb-mocha --allow-console-logs \"dist/__tests__\"",
+    "posttest": "npm run lint",
+    "test:dev": "lb-mocha --allow-console-logs dist/__tests__/**/*.js && npm run posttest",
+    "docker:build": "docker build -t almata-be .",
+    "docker:run": "docker run -p 3000:3000 -d almata-be",
+    "migrate": "node ./dist/migrate",
+    "openapi-spec": "node ./dist/openapi-spec",
+    "prestart": "npm run build",
+    "start": " nodemon -r source-map-support/register .",
+    "clean": "lb-clean dist *.tsbuildinfo .eslintcache"
+  },
+  "repository": {
+    "type": "git"
+  },
+  "author": "",
+  "license": "",
+  "files": [
+    "README.md",
+    "dist",
+    "src",
+    "!*/__tests__"
+  ],
+  "dependencies": {
+    "@loopback/authentication": "^5.0.0",
+    "@loopback/authentication-jwt": "^0.5.0",
+    "@loopback/boot": "^2.4.1",
+    "@loopback/context": "^3.8.1",
+    "@loopback/core": "^2.9.3",
+    "@loopback/repository": "^2.11.0",
+    "@loopback/rest": "^6.0.0",
+    "@loopback/rest-explorer": "^2.2.8",
+    "@loopback/service-proxy": "^2.3.6",
+    "@types/bcryptjs": "^2.4.2",
+    "@types/lodash": "^4.14.152",
+    "bcryptjs": "^2.4.3",
+    "isemail": "^3.2.0",
+    "jsonwebtoken": "^8.5.1",
+    "loopback-connector-mysql": "^5.4.4",
+    "multer": "^1.4.2",
+    "nodemon": "^2.0.4",
+    "pm2": "^4.5.0",
+    "tslib": "^2.0.0"
+  },
+  "devDependencies": {
+    "@loopback/build": "^6.2.0",
+    "source-map-support": "^0.5.19",
+    "@loopback/testlab": "^3.2.2",
+    "@types/node": "^10.17.28",
+    "@types/express-serve-static-core": "^4.17.9",
+    "@types/multer": "^1.4.4",
+    "@loopback/eslint-config": "^9.0.0",
+    "eslint": "^7.6.0",
+    "typescript": "~3.9.7"
+  }
+}
