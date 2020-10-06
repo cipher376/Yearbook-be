@@ -14,6 +14,22 @@ export class Video extends Media {
   })
   schoolId?: number;
 
+  @property({
+    type: 'string',
+  })
+  mimeType: string;
+
+  @property({
+    type: 'string',
+  })
+  thumbnailUrl?: string;
+
+  @property({
+    type: 'string',
+  })
+  posterUrl?: string;
+
+
   constructor(data?: Partial<Video>) {
     super(data);
   }

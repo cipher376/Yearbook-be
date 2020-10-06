@@ -1,1 +1,1 @@
-export * from './memorydb.datasource';
+export * from './db.datasource';

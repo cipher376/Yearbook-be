@@ -10,17 +10,24 @@ import {juggler} from '@loopback/repository';
 //   password: 'TtW{MK%zwT!p',
 //   database: 'devtlrqs_yearbook'
 // };
+
+
+// const config = {
+//   name: 'db',
+//   connector: 'mysql',
+//   url: '',
+//   host: 'localhost',
+//   port: 3306,
+//   user: 'root',
+//   password: '',
+//   database: 'yearbook'
+// };
 const config = {
   name: 'db',
-  connector: 'mysql',
-  url: '',
-  host: 'localhost',
-  port: 3306,
-  user: 'root',
-  password: '',
-  database: 'yearbook'
+  connector: 'memory',
+  localStorage: '',
+  file: './data/db.json'
 };
-
 // Observe application's life cycle to disconnect the datasource when
 // application is stopped. This allows the application to be shut down
 // gracefully. The `stop()` method is inherited from `juggler.DataSource`.

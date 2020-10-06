@@ -32,6 +32,7 @@ import {promisify} from 'util';
 import {FILE_UPLOAD_SERVICE, STORAGE_DIRECTORY} from '../keys';
 import {Media} from '../models';
 import {MediaRepository} from '../repositories';
+import {createImageThumbnail, createVideoPoster, createVideoThumbnail, resizeImage} from '../services/file-crop-resize';
 import {FileUploadHandler} from '../types';
 
 
@@ -195,7 +196,7 @@ export class MediaController {
   /*************************************************/
   /**********UPLOAD AND DOWNLOAD *******************/
   /*************************************************/
-  @post('/media/upload', {
+  @post('/media/upload/{createThumb}', {
     responses: {
       200: {
         content: {
@@ -210,15 +211,17 @@ export class MediaController {
     },
   })
   async fileUpload(
+    @param.path.boolean('createThumb') createThumb: boolean,
     @requestBody.file()
     request: Request,
     @inject(RestBindings.Http.RESPONSE) response: Response,
   ): Promise<object> {
+    console.log(createThumb);
     return new Promise<object>((resolve, reject) => {
       this.handler(request, response, (err: unknown) => {
         if (err) reject(err);
         else {
-          resolve(MediaController.getFilesAndFields(request));
+          resolve(MediaController.getFilesAndFields(request, createThumb));
         }
       });
     });
@@ -228,7 +231,7 @@ export class MediaController {
    * Get files and fields for the request
    * @param request - Http request
    */
-  private static getFilesAndFields(request: Request) {
+  private static getFilesAndFields(request: Request, createThumb = false) {
     const uploadedFiles = request.files;
     const mapper = (f: globalThis.Express.Multer.File) => ({
       fieldname: f.fieldname,
@@ -237,6 +240,49 @@ export class MediaController {
       mimetype: f.mimetype,
       size: f.size,
     });
+    // console.log(request.files);
+
+    if (Array.isArray(uploadedFiles)) {
+      uploadedFiles.forEach(file => {
+        console.log(file.mimetype)
+        // if file is video
+        if (file.mimetype.indexOf('video') > -1) {
+          createVideoThumbnail(file.path, file.destination + "\\thumb_" + file.filename).then(_ => {
+            // console.log('Video thumb created');
+            createVideoPoster(file.path, file.destination + "\\poster_" + file.filename).then(_ => {
+              // console.log('Poster created');
+            }, error => {
+              console.log(error);
+            })
+          }, error => {
+            console.log(error);
+          })
+
+        } else {
+          // Resize image file
+          resizeImage(file.path, 1000).then(_ => {
+            console.log('resize complete')
+            if (createThumb) {
+              createImageThumbnail(file.path, file.destination + "\\thumb_" + file.filename).then(_ => {
+                // console.log('Thumbnail created');
+              }, error => {
+                console.log(error);
+              })
+              // this.createThumbnail().then(_ => {
+              //   console.log('Thumbnail created');
+              // }, error => {
+              //   console.log(error);
+              // })
+            }
+          }, error => {
+            console.log(error);
+          })
+        }
+
+      })
+
+    }
+
     let files: object[] = [];
     if (Array.isArray(uploadedFiles)) {
       files = uploadedFiles.map(mapper);
@@ -247,6 +293,10 @@ export class MediaController {
     }
     return {files, fields: request.body};
   }
+
+  // private static async createThumbnail(src: string, dst: string) {
+  //   return applySmartCrop(src, dst, 128, 128);
+  // }
 
 
 

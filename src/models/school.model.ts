@@ -3,9 +3,9 @@ import {Address} from './address.model';
 import {Alumni} from './alumni.model';
 import {Audio} from './audio.model';
 import {Document} from './document.model';
-import {Photo} from './photo.model';
 import {SchoolDetails} from './school-details.model';
 import {Video} from './video.model';
+import {Photo} from './photo.model';
 
 @model()
 export class School extends Entity {
@@ -40,21 +40,6 @@ export class School extends Entity {
   })
   gender: string;
 
-  @property({
-    type: 'string',
-  })
-
-  thumbnailUrl: string;
-  @property({
-    type: 'string',
-  })
-  coverUrl: string;
-
-  // @property({
-  //   type: 'array',
-  //   itemType: 'string',
-  @hasMany(() => Photo)
-  photos: Photo[];
 
   @hasMany(() => Video)
   videos: Video[];
@@ -62,10 +47,9 @@ export class School extends Entity {
   @hasMany(() => Audio)
   audio: Audio[];
 
+
   @hasMany(() => Document)
   documents: Document[];
-  // })
-  // temp?: string[];
 
   @hasMany(() => Alumni)
   alumni: Alumni[];
@@ -75,6 +59,9 @@ export class School extends Entity {
 
   @hasOne(() => Address)
   address: Address;
+
+  @hasMany(() => Photo)
+  photos: Photo[];
 
   constructor(data?: Partial<School>) {
     super(data);

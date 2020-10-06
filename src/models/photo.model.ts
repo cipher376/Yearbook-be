@@ -12,12 +12,37 @@ export class Photo extends Media {
   @property({
     type: 'number',
   })
-  schoolId?: number;
+  userId?: number;
+
+  @property({
+    type: 'string',
+  })
+  thumbnailUrl?: string;
+
+  @property({
+    type: 'boolean',
+    default: false
+  })
+  coverImage?: boolean;
+
+  @property({
+    type: 'boolean',
+    default: false
+
+  })
+  profile?: boolean;
+
+  @property({
+    type: 'boolean',
+    default: false
+
+  })
+  flag?: boolean;
 
   @property({
     type: 'number',
   })
-  userId?: number;
+  schoolId?: number;
 
   constructor(data?: Partial<Photo>) {
     super(data);

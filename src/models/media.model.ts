@@ -27,16 +27,6 @@ export class Media extends Entity {
   fileUrl: string;
 
   @property({
-    type: 'string',
-  })
-  thumbnailUrl?: string;
-
-  @property({
-    type: 'string',
-  })
-  coverUrl?: string;
-
-  @property({
     type: 'date',
   })
   dateCreated?: string;

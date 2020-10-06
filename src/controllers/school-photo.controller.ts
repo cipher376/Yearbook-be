@@ -3,7 +3,7 @@ import {
   CountSchema,
   Filter,
   repository,
-  Where
+  Where,
 } from '@loopback/repository';
 import {
   del,
@@ -13,15 +13,18 @@ import {
   param,
   patch,
   post,
-  requestBody
+  requestBody,
 } from '@loopback/rest';
-import {Photo, School} from '../models';
+import {
+  School,
+  Photo,
+} from '../models';
 import {SchoolRepository} from '../repositories';
 
 export class SchoolPhotoController {
   constructor(
     @repository(SchoolRepository) protected schoolRepository: SchoolRepository,
-  ) {}
+  ) { }
 
   @get('/schools/{id}/photos', {
     responses: {

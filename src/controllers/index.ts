@@ -33,3 +33,4 @@ export * from './user-user-config.controller';
 export * from './user.controller';
 export * from './alumni-user.controller';
 export * from './message-post-post-config.controller';
+export * from './school-photo.controller';
