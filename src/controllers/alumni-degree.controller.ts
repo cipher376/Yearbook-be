@@ -1,9 +1,11 @@
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {
   Count,
   CountSchema,
   Filter,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
 import {
   del,
@@ -13,18 +15,19 @@ import {
   param,
   patch,
   post,
-  requestBody,
+  requestBody
 } from '@loopback/rest';
+import {ACL_ALUMNI_DEGREE} from '../acls/alumni-degree.acl';
 import {
   Alumni,
-  Degree,
+  Degree
 } from '../models';
 import {AlumniRepository} from '../repositories';
 
 export class AlumniDegreeController {
   constructor(
     @repository(AlumniRepository) protected alumniRepository: AlumniRepository,
-  ) { }
+  ) {}
 
   @get('/alumni/{id}/degree', {
     responses: {
@@ -38,6 +41,8 @@ export class AlumniDegreeController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_ALUMNI_DEGREE['list-all'])
   async get(
     @param.path.number('id') id: number,
     @param.query.object('filter') filter?: Filter<Degree>,
@@ -53,6 +58,8 @@ export class AlumniDegreeController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_ALUMNI_DEGREE['create'])
   async create(
     @param.path.number('id') id: typeof Alumni.prototype.id,
     @requestBody({
@@ -78,6 +85,8 @@ export class AlumniDegreeController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_ALUMNI_DEGREE['update-by-id'])
   async patch(
     @param.path.number('id') id: number,
     @requestBody({
@@ -101,6 +110,8 @@ export class AlumniDegreeController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_ALUMNI_DEGREE['delete-by-id'])
   async delete(
     @param.path.number('id') id: number,
     @param.query.object('where', getWhereSchemaFor(Degree)) where?: Where<Degree>,

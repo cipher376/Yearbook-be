@@ -1,9 +1,10 @@
+import {authenticate} from '@loopback/authentication';
 import {
   Count,
   CountSchema,
   Filter,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
 import {
   del,
@@ -13,18 +14,17 @@ import {
   param,
   patch,
   post,
-  requestBody,
+  requestBody
 } from '@loopback/rest';
 import {
-  School,
-  Alumni,
+  Alumni, School
 } from '../models';
 import {SchoolRepository} from '../repositories';
 
 export class SchoolAlumniController {
   constructor(
     @repository(SchoolRepository) protected schoolRepository: SchoolRepository,
-  ) { }
+  ) {}
 
   @get('/schools/{id}/alumni', {
     responses: {
@@ -38,6 +38,8 @@ export class SchoolAlumniController {
       },
     },
   })
+  @authenticate("jwt")
+  // @authorize(ACL_SCHOOL_ALUMNI['list-all'])
   async find(
     @param.path.number('id') id: number,
     @param.query.object('filter') filter?: Filter<Alumni>,
@@ -53,6 +55,8 @@ export class SchoolAlumniController {
       },
     },
   })
+  @authenticate("jwt")
+  // @authorize(ACL_SCHOOL_ALUMNI['create'])
   async create(
     @param.path.number('id') id: typeof School.prototype.id,
     @requestBody({
@@ -78,6 +82,8 @@ export class SchoolAlumniController {
       },
     },
   })
+  @authenticate("jwt")
+  // @authorize(ACL_SCHOOL_ALUMNI['update-by-id'])
   async patch(
     @param.path.number('id') id: number,
     @requestBody({
@@ -101,6 +107,8 @@ export class SchoolAlumniController {
       },
     },
   })
+  @authenticate("jwt")
+  // @authorize(ACL_SCHOOL_ALUMNI['delete-by-id'])
   async delete(
     @param.path.number('id') id: number,
     @param.query.object('where', getWhereSchemaFor(Alumni)) where?: Where<Alumni>,

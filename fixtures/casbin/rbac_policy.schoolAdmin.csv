@@ -1,0 +1,25 @@
+p, schoolAdmin, school*, update-all
+p, schoolAdmin, school*, update-by-id
+
+p, schoolAdmin, school_video*, create
+p, schoolAdmin, school_video*, delete-by-id
+
+p, schoolAdmin, school_details*, create
+p, schoolAdmin, school_details*, update-by-id
+
+p, schoolAdmin, school_photo*, create
+p, schoolAdmin, school_photo*, delete-by-id
+
+p, schoolAdmin, school_document*, create
+p, schoolAdmin, school_document*, delete-by-id
+
+p, schoolAdmin, school_audio*, create
+p, schoolAdmin, school_audio*, delete-by-id
+
+p, schoolAdmin, school_alumni*, create
+p, schoolAdmin, school_alumni*, delete-by-id
+
+p, schoolAdmin, school_address*, create
+p, schoolAdmin, school_address*, update-by-id
+
+g, schoolAdmin , authUser

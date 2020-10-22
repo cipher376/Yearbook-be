@@ -1,18 +1,13 @@
 import {Getter, inject} from '@loopback/core';
 import {DefaultCrudRepository, HasManyRepositoryFactory, HasOneRepositoryFactory, repository} from '@loopback/repository';
 import {DbDataSource} from '../datasources';
-import {Address, Photo, Post, User, UserConfig, UserRelations, Alumni} from '../models';
+import {Address, Alumni, Photo, Post, User, UserConfig, UserRelations} from '../models';
 import {AddressRepository} from './address.repository';
 import {AlumniRepository} from './alumni.repository';
 import {PhotoRepository} from './photo.repository';
 import {PostRepository} from './post.repository';
 import {UserConfigRepository} from './user-config.repository';
 
-export type Credentials = {
-  email: string;
-  phone?: string;
-  password: string | undefined;
-}
 
 
 export class UserRepository extends DefaultCrudRepository<

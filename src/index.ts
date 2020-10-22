@@ -1,10 +1,10 @@
-import {AlmataBeApplication, ApplicationConfig} from './application';
+import {ApplicationConfig, YearbookBeApplication} from './application';
 import {APP_CONFIG} from './config';
 
 export * from './application';
 
 export async function main(options: ApplicationConfig = {}) {
-  const app = new AlmataBeApplication(options);
+  const app = new YearbookBeApplication(options);
   await app.boot();
   await app.migrateSchema(); //Auto drop and create tables
   await app.start();

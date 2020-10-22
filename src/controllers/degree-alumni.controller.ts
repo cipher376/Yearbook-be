@@ -1,14 +1,15 @@
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {
-  repository,
+  repository
 } from '@loopback/repository';
 import {
-  param,
   get,
-  getModelSchemaRef,
+  getModelSchemaRef, param
 } from '@loopback/rest';
+import {ACL_DEGREE_ALUMNI} from '../acls/degree-alumni.acl';
 import {
-  Degree,
-  Alumni,
+  Alumni, Degree
 } from '../models';
 import {DegreeRepository} from '../repositories';
 
@@ -16,7 +17,7 @@ export class DegreeAlumniController {
   constructor(
     @repository(DegreeRepository)
     public degreeRepository: DegreeRepository,
-  ) { }
+  ) {}
 
   @get('/degrees/{id}/alumni', {
     responses: {
@@ -30,6 +31,8 @@ export class DegreeAlumniController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_DEGREE_ALUMNI['find-by-id'])
   async getAlumni(
     @param.path.number('id') id: typeof Degree.prototype.id,
   ): Promise<Alumni> {

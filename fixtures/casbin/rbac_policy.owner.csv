@@ -1,0 +1,37 @@
+p, s1_owner, school1, update-all
+p, s1_owner, schoo1, update-by-id
+
+p, s1_owner, school_video1, create
+p, s1_owner, school_video1, delete-by-id
+
+p, s1_owner, school_detail1, create
+p, s1_owner, school_details1, update-by-id
+
+p, s1_owner, school_photo1, create
+p, s1_owner, school_photo1, delete-by-id
+
+p, s1_owner, school_document1, create
+p, s1_owner, school_document1, delete-by-id
+
+p, s1_owner, school_audio1, create
+p, s1_owner, school_audio1, delete-by-id
+
+p, s1_owner, school_alumni1, create
+p, s1_owner, school_alumni1, delete-by-id
+
+p, s1_owner, school_address1, create
+p, s1_owner, school_address1, update-by-id
+
+g, s1_owner, authUser
+g, u2, s1_owner
+
+p, u1_owner, user*, me
+p, u1_owner, user*, my-profile
+p, u1_owner, user*, update-by-id
+g, u1_owner, authUser
+g, u1, u1_owner
+
+
+
+
+

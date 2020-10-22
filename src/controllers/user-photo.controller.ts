@@ -1,9 +1,10 @@
+import {authenticate} from '@loopback/authentication';
 import {
   Count,
   CountSchema,
   Filter,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
 import {
   del,
@@ -13,18 +14,17 @@ import {
   param,
   patch,
   post,
-  requestBody,
+  requestBody
 } from '@loopback/rest';
 import {
-  User,
-  Photo,
+  Photo, User
 } from '../models';
 import {UserRepository} from '../repositories';
 
 export class UserPhotoController {
   constructor(
     @repository(UserRepository) protected userRepository: UserRepository,
-  ) { }
+  ) {}
 
   @get('/users/{id}/photos', {
     responses: {
@@ -38,6 +38,8 @@ export class UserPhotoController {
       },
     },
   })
+  @authenticate("jwt")
+  // @authorize(ACL_USER_PHOTO['list-all'])
   async find(
     @param.path.number('id') id: number,
     @param.query.object('filter') filter?: Filter<Photo>,
@@ -53,6 +55,8 @@ export class UserPhotoController {
       },
     },
   })
+  @authenticate("jwt")
+  // @authorize(ACL_USER_PHOTO['list-all'])
   async create(
     @param.path.number('id') id: typeof User.prototype.id,
     @requestBody({
@@ -78,6 +82,8 @@ export class UserPhotoController {
       },
     },
   })
+  @authenticate("jwt")
+  // @authorize(ACL_USER_PHOTO['update-by-id'])
   async patch(
     @param.path.number('id') id: number,
     @requestBody({
@@ -101,6 +107,8 @@ export class UserPhotoController {
       },
     },
   })
+  @authenticate("jwt")
+  // @authorize(ACL_USER_PHOTO['delete-by-id'])
   async delete(
     @param.path.number('id') id: number,
     @param.query.object('where', getWhereSchemaFor(Photo)) where?: Where<Photo>,

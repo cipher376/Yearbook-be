@@ -1,3 +1,4 @@
+import {authenticate} from '@loopback/authentication';
 import {
   Count,
   CountSchema,
@@ -37,6 +38,8 @@ export class SchoolSchoolDetailsController {
       },
     },
   })
+  @authenticate("jwt")
+  // @authorize(ACL_SCHOOL_DETAILS['list-all'])
   async get(
     @param.path.number('id') id: number,
     @param.query.object('filter') filter?: Filter<SchoolDetails>,
@@ -52,6 +55,8 @@ export class SchoolSchoolDetailsController {
       },
     },
   })
+  @authenticate("jwt")
+  // @authorize(ACL_SCHOOL_DETAILS['create'])
   async create(
     @param.path.number('id') id: typeof School.prototype.id,
     @requestBody({
@@ -77,6 +82,8 @@ export class SchoolSchoolDetailsController {
       },
     },
   })
+  @authenticate("jwt")
+  // @authorize(ACL_SCHOOL_DETAILS['update-by-id'])
   async patch(
     @param.path.number('id') id: number,
     @requestBody({
@@ -100,6 +107,8 @@ export class SchoolSchoolDetailsController {
   //     },
   //   },
   // })
+  // @authenticate("jwt")
+  // @authorize(ACL_SCHOOL_PHOTO['delete-by-id'])
   // async delete(
   //   @param.path.number('id') id: number,
   //   @param.query.object('where', getWhereSchemaFor(SchoolDetails)) where?: Where<SchoolDetails>,

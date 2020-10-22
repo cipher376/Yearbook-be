@@ -1,9 +1,10 @@
+import {authenticate} from '@loopback/authentication';
 import {
   Count,
   CountSchema,
   Filter,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
 import {
   del,
@@ -11,20 +12,19 @@ import {
   getModelSchemaRef,
   getWhereSchemaFor,
   param,
-  patch,
+
   post,
-  requestBody,
+  requestBody
 } from '@loopback/rest';
 import {
-  School,
-  Photo,
+  Photo, School
 } from '../models';
 import {SchoolRepository} from '../repositories';
 
 export class SchoolPhotoController {
   constructor(
     @repository(SchoolRepository) protected schoolRepository: SchoolRepository,
-  ) { }
+  ) {}
 
   @get('/schools/{id}/photos', {
     responses: {
@@ -38,6 +38,8 @@ export class SchoolPhotoController {
       },
     },
   })
+  @authenticate("jwt")
+  // @authorize(ACL_SCHOOL_PHOTO['list-all'])
   async find(
     @param.path.number('id') id: number,
     @param.query.object('filter') filter?: Filter<Photo>,
@@ -53,6 +55,8 @@ export class SchoolPhotoController {
       },
     },
   })
+  @authenticate("jwt")
+  // @authorize(ACL_SCHOOL_PHOTO['create'])
   async create(
     @param.path.number('id') id: typeof School.prototype.id,
     @requestBody({
@@ -70,28 +74,30 @@ export class SchoolPhotoController {
     return this.schoolRepository.photos(id).create(photo);
   }
 
-  @patch('/schools/{id}/photos', {
-    responses: {
-      '200': {
-        description: 'School.Photo PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  async patch(
-    @param.path.number('id') id: number,
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Photo, {partial: true}),
-        },
-      },
-    })
-    photo: Partial<Photo>,
-    @param.query.object('where', getWhereSchemaFor(Photo)) where?: Where<Photo>,
-  ): Promise<Count> {
-    return this.schoolRepository.photos(id).patch(photo, where);
-  }
+  // @patch('/schools/{id}/photos', {
+  //   responses: {
+  //     '200': {
+  //       description: 'School.Photo PATCH success count',
+  //       content: {'application/json': {schema: CountSchema}},
+  //     },
+  //   },
+  // })
+  // @authenticate("jwt")
+  // @authorize(ACL_SCHOOL_PHOTO['update-by-id'])
+  // async patch(
+  //   @param.path.number('id') id: number,
+  //   @requestBody({
+  //     content: {
+  //       'application/json': {
+  //         schema: getModelSchemaRef(Photo, {partial: true}),
+  //       },
+  //     },
+  //   })
+  //   photo: Partial<Photo>,
+  //   @param.query.object('where', getWhereSchemaFor(Photo)) where?: Where<Photo>,
+  // ): Promise<Count> {
+  //   return this.schoolRepository.photos(id).patch(photo, where);
+  // }
 
   @del('/schools/{id}/photos', {
     responses: {
@@ -101,6 +107,8 @@ export class SchoolPhotoController {
       },
     },
   })
+  @authenticate("jwt")
+  // @authorize(ACL_SCHOOL_PHOTO['delete-by-id'])
   async delete(
     @param.path.number('id') id: number,
     @param.query.object('where', getWhereSchemaFor(Photo)) where?: Where<Photo>,

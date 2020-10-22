@@ -1,3 +1,4 @@
+import {authenticate} from '@loopback/authentication';
 import {
   Count,
   CountSchema,
@@ -35,6 +36,8 @@ export class UserAddressController {
       },
     },
   })
+  @authenticate("jwt")
+  // @authorize(ACL_USER_ADDRESS['list-all'])
   async get(
     @param.path.number('id') id: number,
     @param.query.object('filter') filter?: Filter<Address>,
@@ -50,6 +53,8 @@ export class UserAddressController {
       },
     },
   })
+  @authenticate("jwt")
+  // @authorize(ACL_USER_ADDRESS['create'])
   async create(
     @param.path.number('id') id: typeof User.prototype.id,
     @requestBody({
@@ -75,6 +80,8 @@ export class UserAddressController {
       },
     },
   })
+  @authenticate("jwt")
+  // @authorize(ACL_USER_ADDRESS['update-by-id'])
   async patch(
     @param.path.number('id') id: number,
     @requestBody({
@@ -98,6 +105,8 @@ export class UserAddressController {
       },
     },
   })
+  @authenticate("jwt")
+  // @authorize(ACL_USER_ADDRESS['delete-by-id'])
   async delete(
     @param.path.number('id') id: number,
     @param.query.object('where', getWhereSchemaFor(Address)) where?: Where<Address>,

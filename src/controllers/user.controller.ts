@@ -17,13 +17,11 @@ import {UserProfile} from '@loopback/security';
 import _ from 'lodash';
 import {PasswordHasherBindings, TokenServiceBindings, UserServiceBindings} from '../keys';
 import {User} from '../models';
-import {Credentials, UserRepository} from '../repositories';
+import {UserRepository} from '../repositories';
 import {validateCredentials} from '../services';
 import {BcryptHasher} from '../services/hash.password';
-import {JWTService} from '../services/jwt-service';
-import {MyUserService} from '../services/user-service';
+import {Credentials, MyJWTService, MyUserService} from '../services/jwt-authentication';
 import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
-
 
 // export interface UserInfo {
 //   firstName: string;
@@ -49,12 +47,11 @@ export class UserController {
 
     // @inject('service.jwt.service')
     @inject(TokenServiceBindings.TOKEN_SERVICE)
-    public jwtService: JWTService,
+    public jwtService: MyJWTService,
 
     // @repository(PhotoRepository)
     // public photoRepository: PhotoRepository
   ) {}
-
 
   @post('/signup', {
     responses: {
@@ -66,6 +63,7 @@ export class UserController {
       }
     }
   })
+  // @authorize(ACL_PROJECT['signup'])
   async signup(@requestBody() userData: User) {
     validateCredentials(_.pick(userData, ['email', 'phone', 'password']));
     // check if user exist
@@ -101,6 +99,7 @@ export class UserController {
       }
     }
   })
+  // @authorize(ACL_PROJECT['login'])
   async login(
     @requestBody() credentials: Credentials,
   ): Promise<{token: string}> {
@@ -144,7 +143,6 @@ export class UserController {
 
 
 
-  @authenticate("jwt")
   @get('/users/me', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
@@ -158,6 +156,8 @@ export class UserController {
       },
     },
   })
+  @authenticate("jwt")
+  // @authorize(ACL_USER['me'])
   async me(
     @inject(AuthenticationBindings.CURRENT_USER)
     currentUser: UserProfile,
@@ -165,7 +165,6 @@ export class UserController {
     return Promise.resolve(currentUser);
   }
 
-  @authenticate("jwt")
   @get('/users/my-profile', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
@@ -179,30 +178,33 @@ export class UserController {
       },
     },
   })
+  @authenticate("jwt")
+  // @authorize(ACL_USER['my-profile'])
   async myProfile(
     @inject(AuthenticationBindings.CURRENT_USER)
-    currentUser: UserProfile
+    currentUser: UserProfile,
   ): Promise<User> {
     // clear the sensitive fields
     const user = await this.findById(currentUser.id);
 
     // gather other user related information
-    try {
-      user.photos = await this.userRepository.photos(currentUser.id).find();
-    } catch (error) {
-      console.log(error);
-    }
+    await this.userRepository.photos(currentUser.id).find().then(ph => {
+      user.photos = ph;
+    }, error => {
+      console.debug(error);
+    });
+    await this.userRepository.userConfig(currentUser.id).get().then(config => {
+      user.userConfig = config
+    }, error => {
+      console.debug(error);
+    })
 
-    try {
-      user.userConfig = await this.userRepository.userConfig(currentUser.id).get()
-    } catch (error) {
-      console.log(error);
-    }
-    try {
-      user.address = await this.userRepository.address(currentUser.id).get();
-    } catch (error) {
-      console.log(error);
-    }
+    await this.userRepository.address(currentUser.id).get().then(add => {
+      user.address = add;
+    }, error => {
+      console.debug(error);
+    })
+
     return Promise.resolve(user);
   }
 
@@ -244,6 +246,8 @@ export class UserController {
       },
     },
   })
+  @authenticate("jwt")
+  // @authorize(ACL_USER['my-profile'])
   async findById(
     @param.path.number('id') id: number,
     @param.filter(User, {exclude: 'where'}) filter?: FilterExcludingWhere<User>
@@ -252,7 +256,6 @@ export class UserController {
     return Promise.resolve(this.userService.convertToUserView(user));
   }
 
-  @authenticate("jwt")
   @patch('/users/{id}', {
     responses: {
       '204': {
@@ -260,6 +263,8 @@ export class UserController {
       },
     },
   })
+  @authenticate("jwt")
+  // @authorize(ACL_USER['update-by-id'])
   async updateById(
     @param.path.number('id') id: number,
     @requestBody({
@@ -311,6 +316,8 @@ export class UserController {
       },
     },
   })
+  @authenticate("jwt")
+  // @authorize(ACL_USER['count'])
   async count(
     @param.where(User) where?: Where<User>,
   ): Promise<Count> {
@@ -333,6 +340,8 @@ export class UserController {
       },
     },
   })
+  @authenticate("jwt")
+  // @authorize(ACL_USER['list-all'])
   async find(
     @param.filter(User) filter?: Filter<User>,
   ): Promise<User[]> {
@@ -363,6 +372,8 @@ export class UserController {
       }
     }
   })
+  @authenticate("jwt")
+  // @authorize(ACL_USER['create-many'])
   async createMany(
     @requestBody({
       content: {

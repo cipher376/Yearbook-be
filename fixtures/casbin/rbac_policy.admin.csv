@@ -1,0 +1,114 @@
+p, admin, address*, list-all
+p, admin, address*, update-all
+p, admin, address*, find-by-id
+p, admin, address*, update-by-id
+p, admin, address*, replace-by-id
+p, admin, address*, delete-by-id
+
+p, admin, alumni_degree*, create
+p, admin, alumni_degree*, list-all
+p, admin, alumni_degree*, update-by-id
+p, admin, alumni_degree*, delete-by-id
+
+p, admin, alumni_user*, find-by-id
+
+p, admin, alumni*, create
+p, admin, alumni*, count
+p, admin, alumni*, list-all
+p, admin, alumni*, update-all
+p, admin, alumni*, find-by-id
+p, admin, alumni*, update-by-id
+p, admin, alumni*, replace-by-id
+p, admin, alumni*, delete-by-id
+
+p, admin, degree_alumni*, find-by-id
+
+p, admin, media*, create
+p, admin, media*, count
+p, admin, media*, list-all
+p, admin, media*, update-all
+p, admin, media*, find-by-id
+p, admin, media*, update-by-id
+p, admin, media*, replace-by-id
+p, admin, media*, delete-by-id
+p, admin, media*, upload
+p, admin, media*, list-all-media
+
+p, admin, photo*, create
+p, admin, photo*, count
+p, admin, photo*, list-all
+p, admin, photo*, update-all
+p, admin, photo*, find-by-id
+p, admin, photo*, update-by-id
+p, admin, photo*, replace-by-id
+p, admin, photo*, delete-by-id
+
+p, admin, school_address*, list-all
+p, admin, school_address*, update-by-id
+p, admin, school_address*, delete-by-id
+
+p, admin, school_alumni*, create
+p, admin, school_alumni*, list-all
+p, admin, school_alumni*, update-by-id
+p, admin, school_alumni*, delete-by-id
+
+p, admin, school_audio*, create
+p, admin, school_audio*, list-all
+p, admin, school_audio*, update-by-id
+p, admin, school_audio*, delete-by-id
+
+p, admin, school_document*, create
+p, admin, school_document*, list-all
+p, admin, school_document*, update-by-id
+p, admin, school_document*, delete-by-id
+
+p, admin, school_photo*, create
+p, admin, school_photo*, list-all
+p, admin, school_photo*, update-by-id
+p, admin, school_photo*, delete-by-id
+
+p, admin, school_details*, create
+p, admin, school_details*, list-all
+p, admin, school_details*, update-by-id
+p, admin, school_details*, delete-by-id
+
+p, admin, school_video*, create
+p, admin, school_video*, list-all
+p, admin, school_video*, update-by-id
+p, admin, school_video*, delete-by-id
+
+p, admin, school*, create
+p, admin, school*, count
+p, admin, school*, list-all
+p, admin, school*, update-all
+p, admin, school*, find-by-id
+p, admin, school*, update-by-id
+p, admin, school*, replace-by-id
+p, admin, school*, delete-by-id
+
+p, admin, user_address*, create
+p, admin, user_address*, list-all
+p, admin, user_address*, update-by-id
+p, admin, user_address*, delete-by-id
+
+p, admin, user_photo*, create
+p, admin, user_photo*, list-all
+p, admin, user_photo*, update-by-id
+p, admin, user_photo*, delete-by-id
+
+p, admin, user*, signup
+p, admin, user*, login
+p, admin, user*, me
+p, admin, user*, my-profile
+p, admin, user*, find-by-id
+p, admin, user*, update-by-id
+p, admin, user*, count
+p, admin, user*, list-all
+p, admin, user*, create-many
+
+
+g, admin, authUser
+g, admin, anonymous
+g, admin, schoolAdmin
+
+g, u1, admin

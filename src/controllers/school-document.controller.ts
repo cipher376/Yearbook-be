@@ -1,9 +1,10 @@
+import {authenticate} from '@loopback/authentication';
 import {
   Count,
   CountSchema,
   Filter,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
 import {
   del,
@@ -11,20 +12,19 @@ import {
   getModelSchemaRef,
   getWhereSchemaFor,
   param,
-  patch,
+
   post,
-  requestBody,
+  requestBody
 } from '@loopback/rest';
 import {
-  School,
-  Document,
+  Document, School
 } from '../models';
 import {SchoolRepository} from '../repositories';
 
 export class SchoolDocumentController {
   constructor(
     @repository(SchoolRepository) protected schoolRepository: SchoolRepository,
-  ) { }
+  ) {}
 
   @get('/schools/{id}/documents', {
     responses: {
@@ -38,6 +38,8 @@ export class SchoolDocumentController {
       },
     },
   })
+  @authenticate("jwt")
+  // @authorize(ACL_SCHOOL_DOCUMENT['list-all'])
   async find(
     @param.path.number('id') id: number,
     @param.query.object('filter') filter?: Filter<Document>,
@@ -53,6 +55,8 @@ export class SchoolDocumentController {
       },
     },
   })
+  @authenticate("jwt")
+  // @authorize(ACL_SCHOOL_DOCUMENT['create'])
   async create(
     @param.path.number('id') id: typeof School.prototype.id,
     @requestBody({
@@ -70,28 +74,30 @@ export class SchoolDocumentController {
     return this.schoolRepository.documents(id).create(document);
   }
 
-  @patch('/schools/{id}/documents', {
-    responses: {
-      '200': {
-        description: 'School.Document PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  async patch(
-    @param.path.number('id') id: number,
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Document, {partial: true}),
-        },
-      },
-    })
-    document: Partial<Document>,
-    @param.query.object('where', getWhereSchemaFor(Document)) where?: Where<Document>,
-  ): Promise<Count> {
-    return this.schoolRepository.documents(id).patch(document, where);
-  }
+  // @patch('/schools/{id}/documents', {
+  //   responses: {
+  //     '200': {
+  //       description: 'School.Document PATCH success count',
+  //       content: {'application/json': {schema: CountSchema}},
+  //     },
+  //   },
+  // })
+  // @authenticate("jwt")
+  // @authorize(ACL_SCHOOL_DOCUMENT['update-by-id'])
+  // async patch(
+  //   @param.path.number('id') id: number,
+  //   @requestBody({
+  //     content: {
+  //       'application/json': {
+  //         schema: getModelSchemaRef(Document, {partial: true}),
+  //       },
+  //     },
+  //   })
+  //   document: Partial<Document>,
+  //   @param.query.object('where', getWhereSchemaFor(Document)) where?: Where<Document>,
+  // ): Promise<Count> {
+  //   return this.schoolRepository.documents(id).patch(document, where);
+  // }
 
   @del('/schools/{id}/documents', {
     responses: {
@@ -101,6 +107,8 @@ export class SchoolDocumentController {
       },
     },
   })
+  @authenticate("jwt")
+  // @authorize(ACL_SCHOOL_DOCUMENT['delete-by-id'])
   async delete(
     @param.path.number('id') id: number,
     @param.query.object('where', getWhereSchemaFor(Document)) where?: Where<Document>,

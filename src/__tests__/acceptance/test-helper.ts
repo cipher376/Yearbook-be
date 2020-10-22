@@ -1,9 +1,8 @@
-import {AlmataBeApplication} from '../..';
 import {
-  createRestAppClient,
-  givenHttpServerConfig,
-  Client,
+  Client, createRestAppClient,
+  givenHttpServerConfig
 } from '@loopback/testlab';
+import {YearbookBeApplication} from '../..';
 
 export async function setupApplication(): Promise<AppWithClient> {
   const restConfig = givenHttpServerConfig({
@@ -14,7 +13,7 @@ export async function setupApplication(): Promise<AppWithClient> {
     // port: +process.env.PORT,
   });
 
-  const app = new AlmataBeApplication({
+  const app = new YearbookBeApplication({
     rest: restConfig,
   });
 
@@ -27,6 +26,6 @@ export async function setupApplication(): Promise<AppWithClient> {
 }
 
 export interface AppWithClient {
-  app: AlmataBeApplication;
+  app: YearbookBeApplication;
   client: Client;
 }

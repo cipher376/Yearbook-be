@@ -1,3 +1,5 @@
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {inject} from '@loopback/core';
 import {
   Count,
@@ -19,7 +21,7 @@ import {
 
   HttpErrors, oas, param,
   patch, post,
-  put,
+
 
 
   Request, requestBody, Response,
@@ -29,6 +31,7 @@ import {
 import fs from 'fs';
 import path from 'path';
 import {promisify} from 'util';
+import {ACL_MEDIA} from '../acls/media.acl';
 import {FILE_UPLOAD_SERVICE, STORAGE_DIRECTORY} from '../keys';
 import {Media} from '../models';
 import {MediaRepository} from '../repositories';
@@ -54,6 +57,8 @@ export class MediaController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_MEDIA['create'])
   async create(
     @requestBody({
       content: {
@@ -78,6 +83,8 @@ export class MediaController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_MEDIA['count'])
   async count(
     @param.where(Media) where?: Where<Media>,
   ): Promise<Count> {
@@ -99,33 +106,35 @@ export class MediaController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_MEDIA['list-all'])
   async find(
     @param.filter(Media) filter?: Filter<Media>,
   ): Promise<Media[]> {
     return this.mediaRepository.find(filter);
   }
 
-  @patch('/media', {
-    responses: {
-      '200': {
-        description: 'Media PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  async updateAll(
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Media, {partial: true}),
-        },
-      },
-    })
-    media: Media,
-    @param.where(Media) where?: Where<Media>,
-  ): Promise<Count> {
-    return this.mediaRepository.updateAll(media, where);
-  }
+  // @patch('/media', {
+  //   responses: {
+  //     '200': {
+  //       description: 'Media PATCH success count',
+  //       content: {'application/json': {schema: CountSchema}},
+  //     },
+  //   },
+  // })
+  // async updateAll(
+  //   @requestBody({
+  //     content: {
+  //       'application/json': {
+  //         schema: getModelSchemaRef(Media, {partial: true}),
+  //       },
+  //     },
+  //   })
+  //   media: Media,
+  //   @param.where(Media) where?: Where<Media>,
+  // ): Promise<Count> {
+  //   return this.mediaRepository.updateAll(media, where);
+  // }
 
   @get('/media/{id}', {
     responses: {
@@ -139,6 +148,8 @@ export class MediaController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_MEDIA['find-by-id'])
   async findById(
     @param.path.number('id') id: number,
     @param.filter(Media, {exclude: 'where'}) filter?: FilterExcludingWhere<Media>
@@ -153,6 +164,8 @@ export class MediaController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_MEDIA['update-by-id'])
   async updateById(
     @param.path.number('id') id: number,
     @requestBody({
@@ -167,19 +180,21 @@ export class MediaController {
     await this.mediaRepository.updateById(id, media);
   }
 
-  @put('/media/{id}', {
-    responses: {
-      '204': {
-        description: 'Media PUT success',
-      },
-    },
-  })
-  async replaceById(
-    @param.path.number('id') id: number,
-    @requestBody() media: Media,
-  ): Promise<void> {
-    await this.mediaRepository.replaceById(id, media);
-  }
+  // @put('/media/{id}', {
+  //   responses: {
+  //     '204': {
+  //       description: 'Media PUT success',
+  //     },
+  //   },
+  // })
+  // @authenticate("jwt")
+  // @authorize(ACL_MEDIA['replace-by-id'])
+  // async replaceById(
+  //   @param.path.number('id') id: number,
+  //   @requestBody() media: Media,
+  // ): Promise<void> {
+  //   await this.mediaRepository.replaceById(id, media);
+  // }
 
   @del('/media/{id}', {
     responses: {
@@ -188,6 +203,8 @@ export class MediaController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_MEDIA['delete-by-id'])
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.mediaRepository.deleteById(id);
   }
@@ -210,6 +227,8 @@ export class MediaController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_MEDIA['upload'])
   async fileUpload(
     @param.path.boolean('createThumb') createThumb: boolean,
     @requestBody.file()
@@ -319,6 +338,8 @@ export class MediaController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_MEDIA['list-all-media'])
   async listFiles() {
     const files = await readdir(this.storageDirectory);
     return files;

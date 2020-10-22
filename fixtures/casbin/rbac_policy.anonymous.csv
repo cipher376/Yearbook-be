@@ -1,0 +1,19 @@
+p, anonymous, media*, list-all
+p, anonymous, media*, find-by-id
+
+p, anonymous, school_audio*, list-all
+
+p, anonymous, school_document*, list-all
+
+p, anonymous, school_photo*, list-all
+
+p, anonymous, school_details*, list-all
+
+p, anonymous, school_video*, list-all
+
+p, anonymous, school*, list-all
+p, anonymous, school*, find-by-id
+
+p, anonymous, user*, signup
+p, anonymous, user*, login
+

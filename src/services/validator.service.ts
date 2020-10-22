@@ -1,6 +1,6 @@
 import {HttpErrors} from '@loopback/rest';
 import * as isEmail from 'isemail';
-import {Credentials} from '../repositories/index';
+import {Credentials} from './jwt-authentication/user.service';
 
 export function validateCredentials(credentials: Credentials) {
   const MIN_PASSWORD_LEN = 6;

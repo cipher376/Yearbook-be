@@ -1,3 +1,4 @@
+import {authenticate} from '@loopback/authentication';
 import {
   Count,
   CountSchema,
@@ -6,6 +7,7 @@ import {
   Where
 } from '@loopback/repository';
 import {
+  del,
   get,
   getModelSchemaRef,
   getWhereSchemaFor,
@@ -36,6 +38,8 @@ export class SchoolAddressController {
       },
     },
   })
+  @authenticate("jwt")
+  // @authorize(ACL_SCHOOL_ADDRESS['list-all'])
   async get(
     @param.path.number('id') id: number,
     @param.query.object('filter') filter?: Filter<Address>,
@@ -51,6 +55,8 @@ export class SchoolAddressController {
       },
     },
   })
+  @authenticate("jwt")
+  // @authorize(ACL_SCHOOL_ADDRESS['create'])
   async create(
     @param.path.number('id') id: typeof School.prototype.id,
     @requestBody({
@@ -76,6 +82,8 @@ export class SchoolAddressController {
       },
     },
   })
+  @authenticate("jwt")
+  // @authorize(ACL_SCHOOL_ADDRESS['update-by-id'])
   async patch(
     @param.path.number('id') id: number,
     @requestBody({
@@ -91,18 +99,20 @@ export class SchoolAddressController {
     return this.schoolRepository.address(id).patch(address, where);
   }
 
-  // @del('/schools/{id}/address', {
-  //   responses: {
-  //     '200': {
-  //       description: 'School.Address DELETE success count',
-  //       content: {'application/json': {schema: CountSchema}},
-  //     },
-  //   },
-  // })
-  // async delete(
-  //   @param.path.number('id') id: number,
-  //   @param.query.object('where', getWhereSchemaFor(Address)) where?: Where<Address>,
-  // ): Promise<Count> {
-  //   return this.schoolRepository.address(id).delete(where);
-  // }
+  @del('/schools/{id}/address', {
+    responses: {
+      '200': {
+        description: 'School.Address DELETE success count',
+        content: {'application/json': {schema: CountSchema}},
+      },
+    },
+  })
+  @authenticate("jwt")
+  // @authorize(ACL_SCHOOL_ADDRESS['delete-by-id'])
+  async delete(
+    @param.path.number('id') id: number,
+    @param.query.object('where', getWhereSchemaFor(Address)) where?: Where<Address>,
+  ): Promise<Count> {
+    return this.schoolRepository.address(id).delete(where);
+  }
 }

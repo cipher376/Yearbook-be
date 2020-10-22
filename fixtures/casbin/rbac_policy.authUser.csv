@@ -1,0 +1,29 @@
+
+p, authUser, alumni_degree*, create
+
+p, authUser, alumni*, create
+p, authUser, alumni*, count
+
+p, authUser, media*, create
+p, authUser, media*, count
+p, authUser, media*, upload
+
+p, authUser, photo*, create
+p, authUser, photo*, count
+p, authUser, photo*, find-by-id
+
+p, authUser, school_alumni*, create
+p, authUser, school_alumni*, list-all
+
+p, authUser, school_audio*, create
+
+p, authUser, school*, count
+
+p, authUser, user_address*, create
+
+p, authUser, user_photo*, create
+
+p, authUser, user*, find-by-id
+p, authUser, user*, list-all
+
+g, u4, authUser

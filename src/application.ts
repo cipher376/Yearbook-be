@@ -1,5 +1,5 @@
 import {AuthenticationComponent, registerAuthenticationStrategy} from '@loopback/authentication';
-import {SECURITY_SCHEME_SPEC} from '@loopback/authentication-jwt';
+import {AuthorizationComponent} from '@loopback/authorization';
 import {BootMixin} from '@loopback/boot';
 import {ApplicationConfig} from '@loopback/core';
 import {RepositoryMixin} from '@loopback/repository';
@@ -11,18 +11,17 @@ import {
 import {ServiceMixin} from '@loopback/service-proxy';
 import multer from 'multer';
 import path from 'path';
-import {JWTStrategy} from './authenticatin-stategies/jwt-stratgies';
 import {FILE_UPLOAD_SERVICE, PasswordHasherBindings, STORAGE_DIRECTORY, TokenServiceBindings, TokenServiceConstants, UserServiceBindings} from './keys';
 import {MySequence} from './sequence';
+import {CasbinAuthorizationComponent} from './services/casbin-authorization/casbin-authorization-component';
 import {BcryptHasher} from './services/hash.password';
-import {JWTService} from './services/jwt-service';
-import {MyUserService} from './services/user-service';
+import {MyJWTService, MyJWTStrategy, MyUserService, SECURITY_SCHEME_SPEC} from './services/jwt-authentication';
 
 
 
 export {ApplicationConfig};
 
-export class AlmataBeApplication extends BootMixin(
+export class YearbookBeApplication extends BootMixin(
   ServiceMixin(RepositoryMixin(RestApplication)),
 ) {
   constructor(options: ApplicationConfig = {}) {
@@ -35,7 +34,9 @@ export class AlmataBeApplication extends BootMixin(
     this.addSecuritySpec();
 
     this.component(AuthenticationComponent);
-    registerAuthenticationStrategy(this, JWTStrategy)
+    this.component(AuthorizationComponent);
+    registerAuthenticationStrategy(this, MyJWTStrategy);
+    this.component(CasbinAuthorizationComponent);
 
 
     // Set up the custom sequence
@@ -84,7 +85,7 @@ export class AlmataBeApplication extends BootMixin(
     this.bind(PasswordHasherBindings.PASSWORD_HASHER).toClass(BcryptHasher);
     this.bind(PasswordHasherBindings.ROUNDS).to(10)
     this.bind(UserServiceBindings.USER_SERVICE).toClass(MyUserService);
-    this.bind(TokenServiceBindings.TOKEN_SERVICE).toClass(JWTService);
+    this.bind(TokenServiceBindings.TOKEN_SERVICE).toClass(MyJWTService);
     this.bind(TokenServiceBindings.TOKEN_SECRET).to(TokenServiceConstants.TOKEN_SECRET_VALUE)
     this.bind(TokenServiceBindings.TOKEN_EXPIRES_IN).to(TokenServiceConstants.TOKEN_EXPIRES_IN_VALUE);
   }

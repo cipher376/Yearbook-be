@@ -1,7 +1,7 @@
 import path from 'path';
-import { ApplicationConfig } from '.';
+import {ApplicationConfig} from '.';
 
-var originsWhitelist = [
+const originsWhitelist = [
   'http://localhost:8100',      //this is my front-end url for development
   'http://www.devtek-limited.com',
   'http://www.devtek-limited.tech'
@@ -27,7 +27,7 @@ export const APP_CONFIG: ApplicationConfig =
   },
   cors: {
     origin: (origin: string, callback: any) => {
-      var isWhitelisted = originsWhitelist.indexOf(origin) !== -1;
+      const isWhitelisted = originsWhitelist.indexOf(origin) !== -1;
       callback(null, isWhitelisted);
     },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -35,7 +35,7 @@ export const APP_CONFIG: ApplicationConfig =
     optionsSuccessStatus: 204,
     maxAge: 86400,
     credentials: true,
-    exposedHeaders: ['Content-Length','Cache-Control','Content-Language','Content-Type', 'Expires', 'Last-Modified', 'Authorization']
+    exposedHeaders: ['Content-Length', 'Cache-Control', 'Content-Language', 'Content-Type', 'Expires', 'Last-Modified', 'Authorization']
   }
 };
 
