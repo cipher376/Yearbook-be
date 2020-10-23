@@ -1,5 +1,4 @@
 import {authenticate} from '@loopback/authentication';
-import {authorize} from '@loopback/authorization';
 import {
   Count,
   CountSchema,
@@ -10,9 +9,8 @@ import {
 } from '@loopback/repository';
 import {
   get,
-  getModelSchemaRef, param
+  getModelSchemaRef, param, post, requestBody
 } from '@loopback/rest';
-import {ACL_ADDRESS} from '../acls/address.acl';
 import {Address} from '../models';
 import {AddressRepository} from '../repositories';
 
@@ -22,29 +20,67 @@ export class AddressController {
     public addressRepository: AddressRepository,
   ) {}
 
-  // @post('/addresses', {
-  //   responses: {
-  //     '200': {
-  //       description: 'Address model instance',
-  //       content: {'application/json': {schema: getModelSchemaRef(Address)}},
-  //     },
-  //   },
-  // })
-  // async create(
-  //   @requestBody({
-  //     content: {
-  //       'application/json': {
-  //         schema: getModelSchemaRef(Address, {
-  //           title: 'NewAddress',
-  //           exclude: ['id'],
-  //         }),
-  //       },
-  //     },
-  //   })
-  //   address: Omit<Address, 'id'>,
-  // ): Promise<Address> {
-  //   return this.addressRepository.create(address);
-  // }
+  @post('/addresses', {
+    responses: {
+      '200': {
+        description: 'Address model instance',
+        content: {'application/json': {schema: getModelSchemaRef(Address)}},
+      },
+    },
+  })
+  async create(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(Address, {
+            title: 'NewAddress',
+            exclude: ['id'],
+          }),
+        },
+      },
+    })
+    address: Omit<Address, 'id'>,
+  ): Promise<Address> {
+    return this.addressRepository.create(address);
+  }
+
+
+  @post('/school-address-create-many', {
+    responses: {
+      '200': {
+        description: 'Address model instance',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'array',
+              "items": getModelSchemaRef(Address)
+            }
+          }
+        },
+      },
+    },
+  })
+  async createMany(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: {
+            type: 'array',
+            "items": getModelSchemaRef(Address, {
+              includeRelations: false,
+              title: 'MoreAddress',
+              exclude: ['id', 'userId'],
+            })
+          }
+        },
+      },
+    })
+    address: Address[],
+  ): Promise<Address[]> {
+    console.log(address);
+    return this.addressRepository.createAll(address);
+  }
+
 
   @get('/addresses/count', {
     responses: {
@@ -55,7 +91,7 @@ export class AddressController {
     },
   })
   @authenticate("jwt")
-  @authorize(ACL_ADDRESS['count'])
+  // @authorize(ACL_ADDRESS['count'])
   async count(
     @param.where(Address) where?: Where<Address>,
   ): Promise<Count> {
@@ -122,7 +158,7 @@ export class AddressController {
     },
   })
   @authenticate("jwt")
-  @authorize(ACL_ADDRESS['find-by-id'])
+  // @authorize(ACL_ADDRESS['find-by-id'])
   async findById(
     @param.path.number('id') id: number,
     @param.filter(Address, {exclude: 'where'}) filter?: FilterExcludingWhere<Address>

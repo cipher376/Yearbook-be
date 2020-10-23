@@ -1,27 +1,27 @@
 import {inject, lifeCycleObserver, LifeCycleObserver} from '@loopback/core';
 import {juggler} from '@loopback/repository';
-export const DB_CONFIG = {
-  name: 'db',
-  connector: 'mysql',
-  url: '',
-  host: 'localhost',
-  port: 3306,
-  user: 'c1yearbook_user',
-  password: '#Dev2020_Db@M',
-  database: 'c1yearbookdb'
-};
-
-
 // export const DB_CONFIG = {
 //   name: 'db',
 //   connector: 'mysql',
 //   url: '',
 //   host: 'localhost',
 //   port: 3306,
-//   user: 'root',
-//   password: '',
-//   database: 'yearbook'
+//   user: 'c1yearbook_user',
+//   password: '#Dev2020_Db@M',
+//   database: 'c1yearbookdb'
 // };
+
+
+export const DB_CONFIG = {
+  name: 'db',
+  connector: 'mysql',
+  url: '',
+  host: 'localhost',
+  port: 3306,
+  user: 'root',
+  password: '',
+  database: 'yearbook'
+};
 
 // const DB_CONFIG = {
 //   name: 'db',

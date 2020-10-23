@@ -10,9 +10,9 @@ export class SchoolDetails extends Entity {
   id?: number;
 
   @property({
-    type: 'number',
+    type: 'string',
   })
-  accommodationType?: number;
+  accommodationType?: string;
 
   @property({
     type: 'string',
@@ -59,7 +59,7 @@ export class SchoolDetails extends Entity {
   @property({
     type: 'number',
   })
-  totalStudents: string;
+  totalStudents: number;
 
   @property({
     type: 'string',
@@ -94,7 +94,7 @@ export class SchoolDetails extends Entity {
   vision: string;
 
   @property({
-    type: 'string',
+    type: 'number',
   })
   alumniCount: number;
 
