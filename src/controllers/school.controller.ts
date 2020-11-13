@@ -15,6 +15,7 @@ import {
 } from '@loopback/rest';
 import {School} from '../models';
 import {SchoolRepository} from '../repositories';
+import {User} from './../models/user.model';
 const applyFilter = require('loopback-filters');
 
 export class SchoolController {
@@ -460,6 +461,27 @@ export class SchoolController {
   // @authorize(ACL_SCHOOL['delete-by-id'])
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.schoolRepository.deleteById(id);
+  }
+
+
+
+  @get('/schools/{id}/alumni', {
+    responses: {
+      '200': {
+        description: 'Array of User has many Alumni',
+        content: {
+          'application/json': {
+            schema: {type: 'array', items: getModelSchemaRef(User)},
+          },
+        },
+      },
+    },
+  })
+  async findAlumni(
+    @param.path.number('id') id: number,
+    @param.query.object('filter') filter?: Filter<User>,
+  ): Promise<User[]> {
+    return this.schoolRepository.users(id).find(filter);
   }
 
 

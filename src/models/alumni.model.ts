@@ -1,7 +1,5 @@
-import {belongsTo, Entity, hasOne, model, property} from '@loopback/repository';
+import {Entity, hasOne, model, property} from '@loopback/repository';
 import {Degree} from './degree.model';
-import {School} from './school.model';
-import {User} from './user.model';
 
 @model()
 export class Alumni extends Entity {
@@ -29,14 +27,18 @@ export class Alumni extends Entity {
   })
   schoolIndexNumber: string;
 
-  @belongsTo(() => School)
-  schoolId: number;
-
   @hasOne(() => Degree)
   degree: Degree;
 
-  @belongsTo(() => User)
-  userId: number;
+  @property({
+    type: 'number',
+  })
+  schoolId?: number;
+
+  @property({
+    type: 'number',
+  })
+  userId?: number;
 
   constructor(data?: Partial<Alumni>) {
     super(data);

@@ -95,6 +95,7 @@ export class SchoolDetails extends Entity {
 
   @property({
     type: 'number',
+    default: 0
   })
   alumniCount: number;
 

@@ -20,6 +20,11 @@ export class Photo extends Media {
   thumbnailUrl?: string;
 
   @property({
+    type: 'string',
+  })
+  legend?: string;
+
+  @property({
     type: 'boolean',
     default: false
   })
@@ -43,6 +48,18 @@ export class Photo extends Media {
     type: 'number',
   })
   schoolId?: number;
+
+  @property({
+    type: 'string',
+  })
+  mimeType: string;
+
+  @property({
+    type: 'number',
+  })
+  postId?: number;
+
+
 
   constructor(data?: Partial<Photo>) {
     super(data);

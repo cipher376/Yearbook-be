@@ -28,7 +28,7 @@ export async function resizeImage(src: string, width: number, quality = 90) {
   return resizeOptimizeImages(options);
 }
 
-export async function createVideoThumbnail(src: string, dst: string, size = '300x200', time = '00:00:22') {
+export async function createVideoThumbnail(src: string, dst: string, size = '300x200', time = '00:00:02') {
   return Thumbler({
     type: 'video',
     input: src,
@@ -40,7 +40,7 @@ export async function createVideoThumbnail(src: string, dst: string, size = '300
     return path;
   });
 }
-export async function createImageThumbnail(src: string, dst: string, size = '128x128') {
+export async function createImageThumbnail(src: string, dst: string, size = '200x200') {
   return Thumbler({
     type: 'image',
     input: src,

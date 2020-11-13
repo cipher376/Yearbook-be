@@ -20,6 +20,13 @@ import {
 
 
 
+  post,
+
+
+
+
+
+
   requestBody
 } from '@loopback/rest';
 import {ACL_PHOTO} from '../acls/photo.acl';
@@ -32,31 +39,40 @@ export class PhotoController {
     public photoRepository: PhotoRepository,
   ) {}
 
-  // @post('/photos', {
-  //   responses: {
-  //     '200': {
-  //       description: 'Photo model instance',
-  //       content: {'application/json': {schema: getModelSchemaRef(Photo)}},
-  //     },
-  //   },
-  // })
+  @post('/photos-createMany', {
+    responses: {
+      '200': {
+        description: 'Photo model instance',
+        content: {'application/json': {schema: {type: 'array', items: getModelSchemaRef(Photo)}}},
+      },
+    },
+  })
   // @authenticate("jwt")
   // @authorize(ACL_PHOTO['create'])
-  // async create(
-  //   @requestBody({
-  //     content: {
-  //       'application/json': {
-  //         schema: getModelSchemaRef(Photo, {
-  //           title: 'NewPhoto',
-  //           exclude: ['id'],
-  //         }),
-  //       },
-  //     },
-  //   })
-  //   photo: Omit<Photo, 'id'>,
-  // ): Promise<Photo> {
-  //   return this.photoRepository.create(photo);
-  // }
+  async createMany(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: {
+            type: 'array',
+            items: getModelSchemaRef(Photo, {includeRelations: true})
+          }
+        },
+      },
+    })
+    photos: Photo[],
+  ): Promise<Photo[]> {
+    // clean id if exist
+    const tem: Photo[] = [];
+    photos.forEach((ph, i) => {
+      ph.id = undefined as any;
+      // filter if userId is not set
+      if (ph.userId) {
+        tem.push(ph)
+      }
+    });
+    return this.photoRepository.createAll(tem);
+  }
 
   @get('/photos/count', {
     responses: {
@@ -90,7 +106,7 @@ export class PhotoController {
     },
   })
   @authenticate("jwt")
-  @authorize(ACL_PHOTO['list-all'])
+  // @authorize(ACL_PHOTO['list-all'])
   async find(
     @param.filter(Photo) filter?: Filter<Photo>,
   ): Promise<Photo[]> {

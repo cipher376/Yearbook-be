@@ -14,6 +14,27 @@ export class Document extends Media {
   })
   schoolId?: number;
 
+  @property({
+    type: 'string',
+    required: true,
+  })
+  title: string;
+
+  @property({
+    type: 'string',
+  })
+  author?: string;
+
+  @property({
+    type: 'number',
+  })
+  postId?: number;
+
+  @property({
+    type: 'number',
+  })
+  userId?: number;
+
   constructor(data?: Partial<Document>) {
     super(data);
   }

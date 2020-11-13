@@ -16,20 +16,20 @@ import {
   requestBody,
 } from '@loopback/rest';
 import {
-  MediaPost,
+  Post,
   PostConfig,
 } from '../models';
-import {MediaPostRepository} from '../repositories';
+import {PostRepository} from '../repositories';
 
-export class MediaPostPostConfigController {
+export class PostPostConfigController {
   constructor(
-    @repository(MediaPostRepository) protected mediaPostRepository: MediaPostRepository,
+    @repository(PostRepository) protected postRepository: PostRepository,
   ) { }
 
-  @get('/media-posts/{id}/post-config', {
+  @get('/posts/{id}/post-config', {
     responses: {
       '200': {
-        description: 'MediaPost has one PostConfig',
+        description: 'Post has one PostConfig',
         content: {
           'application/json': {
             schema: getModelSchemaRef(PostConfig),
@@ -42,38 +42,38 @@ export class MediaPostPostConfigController {
     @param.path.number('id') id: number,
     @param.query.object('filter') filter?: Filter<PostConfig>,
   ): Promise<PostConfig> {
-    return this.mediaPostRepository.postConfig(id).get(filter);
+    return this.postRepository.postConfig(id).get(filter);
   }
 
-  @post('/media-posts/{id}/post-config', {
+  @post('/posts/{id}/post-config', {
     responses: {
       '200': {
-        description: 'MediaPost model instance',
+        description: 'Post model instance',
         content: {'application/json': {schema: getModelSchemaRef(PostConfig)}},
       },
     },
   })
   async create(
-    @param.path.number('id') id: typeof MediaPost.prototype.id,
+    @param.path.number('id') id: typeof Post.prototype.id,
     @requestBody({
       content: {
         'application/json': {
           schema: getModelSchemaRef(PostConfig, {
-            title: 'NewPostConfigInMediaPost',
+            title: 'NewPostConfigInPost',
             exclude: ['id'],
-            optional: ['mediaPostId']
+            optional: ['postId']
           }),
         },
       },
     }) postConfig: Omit<PostConfig, 'id'>,
   ): Promise<PostConfig> {
-    return this.mediaPostRepository.postConfig(id).create(postConfig);
+    return this.postRepository.postConfig(id).create(postConfig);
   }
 
-  @patch('/media-posts/{id}/post-config', {
+  @patch('/posts/{id}/post-config', {
     responses: {
       '200': {
-        description: 'MediaPost.PostConfig PATCH success count',
+        description: 'Post.PostConfig PATCH success count',
         content: {'application/json': {schema: CountSchema}},
       },
     },
@@ -90,13 +90,13 @@ export class MediaPostPostConfigController {
     postConfig: Partial<PostConfig>,
     @param.query.object('where', getWhereSchemaFor(PostConfig)) where?: Where<PostConfig>,
   ): Promise<Count> {
-    return this.mediaPostRepository.postConfig(id).patch(postConfig, where);
+    return this.postRepository.postConfig(id).patch(postConfig, where);
   }
 
-  @del('/media-posts/{id}/post-config', {
+  @del('/posts/{id}/post-config', {
     responses: {
       '200': {
-        description: 'MediaPost.PostConfig DELETE success count',
+        description: 'Post.PostConfig DELETE success count',
         content: {'application/json': {schema: CountSchema}},
       },
     },
@@ -105,6 +105,6 @@ export class MediaPostPostConfigController {
     @param.path.number('id') id: number,
     @param.query.object('where', getWhereSchemaFor(PostConfig)) where?: Where<PostConfig>,
   ): Promise<Count> {
-    return this.mediaPostRepository.postConfig(id).delete(where);
+    return this.postRepository.postConfig(id).delete(where);
   }
 }

@@ -12,7 +12,22 @@ export class Audio extends Media {
   @property({
     type: 'number',
   })
+  length?: number; // in seconds
+
+  @property({
+    type: 'number',
+  })
   schoolId?: number;
+
+  @property({
+    type: 'number',
+  })
+  postId?: number;
+
+  @property({
+    type: 'number',
+  })
+  userId?: number;
 
   constructor(data?: Partial<Audio>) {
     super(data);

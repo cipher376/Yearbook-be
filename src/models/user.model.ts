@@ -3,7 +3,11 @@ import {Address} from './address.model';
 import {Photo} from './photo.model';
 import {Post} from './post.model';
 import {UserConfig} from './user-config.model';
+import {School} from './school.model';
 import {Alumni} from './alumni.model';
+import {Video} from './video.model';
+import {Audio} from './audio.model';
+import {Document} from './document.model';
 
 @model()
 export class User extends Entity {
@@ -134,8 +138,17 @@ export class User extends Entity {
   @hasOne(() => Address)
   address: Address;
 
-  @hasMany(() => Alumni)
-  alumni: Alumni[];
+  @hasMany(() => School, {through: {model: () => Alumni}})
+  schools: School[];
+
+  @hasMany(() => Video)
+  videos: Video[];
+
+  @hasMany(() => Audio)
+  audio: Audio[];
+
+  @hasMany(() => Document)
+  documents: Document[];
 
   constructor(data?: Partial<User>) {
     super(data);

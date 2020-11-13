@@ -1,11 +1,13 @@
 import {Entity, hasMany, hasOne, model, property} from '@loopback/repository';
 import {Address} from './address.model';
-import {Alumni} from './alumni.model';
 import {Audio} from './audio.model';
 import {Document} from './document.model';
+import {Photo} from './photo.model';
 import {SchoolDetails} from './school-details.model';
 import {Video} from './video.model';
-import {Photo} from './photo.model';
+import {User} from './user.model';
+import {Alumni} from './alumni.model';
+import {Post} from './post.model';
 
 @model()
 export class School extends Entity {
@@ -51,8 +53,6 @@ export class School extends Entity {
   @hasMany(() => Document)
   documents: Document[];
 
-  @hasMany(() => Alumni)
-  alumni: Alumni[];
 
   @hasOne(() => SchoolDetails)
   schoolDetails: SchoolDetails;
@@ -62,6 +62,12 @@ export class School extends Entity {
 
   @hasMany(() => Photo)
   photos: Photo[];
+
+  @hasMany(() => User, {through: {model: () => Alumni}})
+  users: User[];
+
+  @hasMany(() => Post)
+  posts: Post[];
 
   constructor(data?: Partial<School>) {
     super(data);

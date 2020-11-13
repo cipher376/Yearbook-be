@@ -1,10 +1,9 @@
-// import {authenticate} from '@loopback/authentication';
 // import {
 //   Count,
 //   CountSchema,
 //   Filter,
 //   repository,
-//   Where
+//   Where,
 // } from '@loopback/repository';
 // import {
 //   del,
@@ -14,22 +13,23 @@
 //   param,
 //   patch,
 //   post,
-//   requestBody
+//   requestBody,
 // } from '@loopback/rest';
 // import {
-//   Alumni, School
+//   User,
+//   Alumni,
 // } from '../models';
-// import {SchoolRepository} from '../repositories';
+// import {UserRepository} from '../repositories';
 
-// export class SchoolAlumniController {
+// export class UserAlumniController {
 //   constructor(
-//     @repository(SchoolRepository) protected schoolRepository: SchoolRepository,
-//   ) {}
+//     @repository(UserRepository) protected userRepository: UserRepository,
+//   ) { }
 
-//   @get('/schools/{id}/alumni', {
+//   @get('/users/{id}/alumni', {
 //     responses: {
 //       '200': {
-//         description: 'Array of School has many Alumni',
+//         description: 'Array of User has many Alumni',
 //         content: {
 //           'application/json': {
 //             schema: {type: 'array', items: getModelSchemaRef(Alumni)},
@@ -38,52 +38,46 @@
 //       },
 //     },
 //   })
-//   @authenticate("jwt")
-//   // @authorize(ACL_SCHOOL_ALUMNI['list-all'])
 //   async find(
 //     @param.path.number('id') id: number,
 //     @param.query.object('filter') filter?: Filter<Alumni>,
 //   ): Promise<Alumni[]> {
-//     return this.schoolRepository.alumni(id).find(filter);
+//     return this.userRepository.alumni(id).find(filter);
 //   }
 
-//   @post('/schools/{id}/alumni', {
+//   @post('/users/{id}/alumni', {
 //     responses: {
 //       '200': {
-//         description: 'School model instance',
+//         description: 'User model instance',
 //         content: {'application/json': {schema: getModelSchemaRef(Alumni)}},
 //       },
 //     },
 //   })
-//   @authenticate("jwt")
-//   // @authorize(ACL_SCHOOL_ALUMNI['create'])
 //   async create(
-//     @param.path.number('id') id: typeof School.prototype.id,
+//     @param.path.number('id') id: typeof User.prototype.id,
 //     @requestBody({
 //       content: {
 //         'application/json': {
 //           schema: getModelSchemaRef(Alumni, {
-//             title: 'NewAlumniInSchool',
+//             title: 'NewAlumniInUser',
 //             exclude: ['id'],
-//             optional: ['schoolId']
+//             optional: ['userId']
 //           }),
 //         },
 //       },
 //     }) alumni: Omit<Alumni, 'id'>,
 //   ): Promise<Alumni> {
-//     return this.schoolRepository.alumni(id).create(alumni);
+//     return this.userRepository.alumni(id).create(alumni);
 //   }
 
-//   @patch('/schools/{id}/alumni', {
+//   @patch('/users/{id}/alumni', {
 //     responses: {
 //       '200': {
-//         description: 'School.Alumni PATCH success count',
+//         description: 'User.Alumni PATCH success count',
 //         content: {'application/json': {schema: CountSchema}},
 //       },
 //     },
 //   })
-//   @authenticate("jwt")
-//   // @authorize(ACL_SCHOOL_ALUMNI['update-by-id'])
 //   async patch(
 //     @param.path.number('id') id: number,
 //     @requestBody({
@@ -96,23 +90,21 @@
 //     alumni: Partial<Alumni>,
 //     @param.query.object('where', getWhereSchemaFor(Alumni)) where?: Where<Alumni>,
 //   ): Promise<Count> {
-//     return this.schoolRepository.alumni(id).patch(alumni, where);
+//     return this.userRepository.alumni(id).patch(alumni, where);
 //   }
 
-//   @del('/schools/{id}/alumni', {
+//   @del('/users/{id}/alumni', {
 //     responses: {
 //       '200': {
-//         description: 'School.Alumni DELETE success count',
+//         description: 'User.Alumni DELETE success count',
 //         content: {'application/json': {schema: CountSchema}},
 //       },
 //     },
 //   })
-//   @authenticate("jwt")
-//   // @authorize(ACL_SCHOOL_ALUMNI['delete-by-id'])
 //   async delete(
 //     @param.path.number('id') id: number,
 //     @param.query.object('where', getWhereSchemaFor(Alumni)) where?: Where<Alumni>,
 //   ): Promise<Count> {
-//     return this.schoolRepository.alumni(id).delete(where);
+//     return this.userRepository.alumni(id).delete(where);
 //   }
 // }

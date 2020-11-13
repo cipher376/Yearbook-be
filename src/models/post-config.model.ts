@@ -1,5 +1,4 @@
-import {Entity, model, property, hasOne} from '@loopback/repository';
-import {MessagePost} from './message-post.model';
+import {Entity, model, property} from '@loopback/repository';
 
 @model()
 export class PostConfig extends Entity {
@@ -25,33 +24,13 @@ export class PostConfig extends Entity {
   @property({
     type: 'number',
   })
-  documentPostId?: number;
-
-  @property({
-    type: 'number',
-  })
-  mediaPostId?: number;
-
-  @hasOne(() => MessagePost)
-  messagePost: MessagePost;
-
-  @property({
-    type: 'number',
-  })
-  photoPostId?: number;
-
-  @property({
-    type: 'number',
-  })
-  messagePostId?: number;
-  // @property({
-  //   type: 'number',
-  // })
-  // messagePostId?: number;
+  postId?: number;
 
   constructor(data?: Partial<PostConfig>) {
     super(data);
   }
+
+
 }
 
 export interface PostConfigRelations {

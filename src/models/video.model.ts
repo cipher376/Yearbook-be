@@ -5,9 +5,14 @@ import {Media} from './media.model';
 export class Video extends Media {
   @property({
     id: true,
-    description: 'The unique identifier for a product',
+    description: 'The unique identifier for a video',
   })
   id: number;
+
+  @property({
+    type: 'number',
+  })
+  length?: 'number'; // in seconds
 
   @property({
     type: 'number',
@@ -29,6 +34,15 @@ export class Video extends Media {
   })
   posterUrl?: string;
 
+  @property({
+    type: 'number',
+  })
+  postId?: number;
+
+  @property({
+    type: 'number',
+  })
+  userId?: number;
 
   constructor(data?: Partial<Video>) {
     super(data);

@@ -47,7 +47,7 @@ export class MediaController {
     @inject(STORAGE_DIRECTORY) private storageDirectory: string,
     @repository(MediaRepository)
     public mediaRepository: MediaRepository,
-  ) {}
+  ) { }
 
   @post('/media', {
     responses: {
@@ -228,7 +228,7 @@ export class MediaController {
     },
   })
   @authenticate("jwt")
-  @authorize(ACL_MEDIA['upload'])
+  // @authorize(ACL_MEDIA['upload'])
   async fileUpload(
     @param.path.boolean('createThumb') createThumb: boolean,
     @requestBody.file()
@@ -265,10 +265,13 @@ export class MediaController {
       uploadedFiles.forEach(file => {
         console.log(file.mimetype)
         // if file is video
-        if (file.mimetype.indexOf('video') > -1) {
-          createVideoThumbnail(file.path, file.destination + "\\thumb_" + file.filename).then(_ => {
+        if (this.isVideo(file.filename)) {
+          const fileName = file.filename.substr(0, file.filename.lastIndexOf('.')) + '.jpg';
+          console.log(fileName)
+          console.log(file.path);
+          createVideoThumbnail(file.path, file.destination + "\\thumb_" + fileName).then(_ => {
             // console.log('Video thumb created');
-            createVideoPoster(file.path, file.destination + "\\poster_" + file.filename).then(_ => {
+            createVideoPoster(file.path, file.destination + "\\poster_" + fileName).then(_ => {
               // console.log('Poster created');
             }, error => {
               console.log(error);
@@ -282,7 +285,7 @@ export class MediaController {
           resizeImage(file.path, 1000).then(_ => {
             console.log('resize complete')
             if (createThumb) {
-              createImageThumbnail(file.path, file.destination + "\\thumb_" + file.filename).then(_ => {
+              createImageThumbnail(file.path, file?.destination + "\\thumb_" + file.filename).then(_ => {
                 // console.log('Thumbnail created');
               }, error => {
                 console.log(error);
@@ -366,5 +369,18 @@ export class MediaController {
     if (resolved.startsWith(this.storageDirectory)) return resolved;
     // The resolved file is outside sandbox
     throw new HttpErrors.BadRequest(`Invalid file name: ${fileName}`);
+  }
+
+  static isVideo(uri: string) {
+    if (
+      ((uri?.toLocaleLowerCase()?.split('/')?.pop()) ?? '').search('.avi') > -1 ||
+      ((uri?.toLocaleLowerCase()?.split('/')?.pop()) ?? '').search('.mov') > -1 ||
+      ((uri?.toLocaleLowerCase()?.split('/')?.pop()) ?? '').search('.mp4') > -1 ||
+      ((uri?.toLocaleLowerCase()?.split('/')?.pop()) ?? '').search('.3gp') > -1 ||
+      ((uri?.toLocaleLowerCase()?.split('/')?.pop()) ?? '').search('.webm') > -1 ||
+      ((uri?.toLocaleLowerCase()?.split('/')?.pop()) ?? '').search('.ogg') > -1 ||
+      ((uri?.toLocaleLowerCase()?.split('/')?.pop()) ?? '').search('.mkv') > -1) {
+      return true;
+    }
   }
 }
