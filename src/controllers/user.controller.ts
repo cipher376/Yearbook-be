@@ -51,7 +51,7 @@ export class UserController {
 
     // @repository(PhotoRepository)
     // public photoRepository: PhotoRepository
-  ) {}
+  ) { }
 
   @post('/signup', {
     responses: {
@@ -355,7 +355,7 @@ export class UserController {
         ]
       }
     }
-    console.log(filter);
+    // console.log(filter);
     return this.userService.getUsers(filter);
   }
 

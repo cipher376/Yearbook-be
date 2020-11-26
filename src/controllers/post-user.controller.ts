@@ -1,22 +1,44 @@
 import {
-  repository,
+  Filter,
+  repository
 } from '@loopback/repository';
 import {
-  param,
   get,
   getModelSchemaRef,
+
+  param
 } from '@loopback/rest';
 import {
   Post,
-  User,
+
+  User
 } from '../models';
 import {PostRepository} from '../repositories';
 
 export class PostUserController {
   constructor(
-    @repository(PostRepository)
-    public postRepository: PostRepository,
+    @repository(PostRepository) protected postRepository: PostRepository,
   ) { }
+
+  @get('/posts/{id}/likedUsers', {
+    responses: {
+      '200': {
+        description: 'Array of Post has many User through LikeThrough',
+        content: {
+          'application/json': {
+            schema: {type: 'array', items: getModelSchemaRef(User)},
+          },
+        },
+      },
+    },
+  })
+  async findLikedUser(
+    @param.path.number('id') id: number,
+    @param.query.object('filter') filter?: Filter<User>,
+  ): Promise<User[]> {
+    return this.postRepository.likedUsers(id).find(filter);
+  }
+
 
   @get('/posts/{id}/user', {
     responses: {

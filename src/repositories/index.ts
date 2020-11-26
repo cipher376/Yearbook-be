@@ -18,3 +18,7 @@ export * from './post-photo-through.repository';
 export * from './post-video-through.repository';
 export * from './post-audio-through.repository';
 export * from './post-document-through.repository';
+export * from './comment.repository';
+export * from './friendship-through.repository';
+export * from './follow-through.repository';
+export * from './like-through.repository';

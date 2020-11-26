@@ -21,13 +21,20 @@ import {
   requestBody
 } from '@loopback/rest';
 import {Post} from '../models';
-import {PostRepository} from '../repositories';
+import {PostAudioThroughRepository, PostRepository, PostVideoThroughRepository} from '../repositories';
+import {PostPhotoThroughRepository} from './../repositories/post-photo-through.repository';
 
 export class PostController {
   constructor(
     @repository(PostRepository)
     public postRepository: PostRepository,
-  ) {}
+    @repository(PostPhotoThroughRepository)
+    public postPhotoThroughRepository: PostPhotoThroughRepository,
+    @repository(PostVideoThroughRepository)
+    public postVideoThroughRepository: PostVideoThroughRepository,
+    @repository(PostAudioThroughRepository)
+    public postAudioThroughRepository: PostAudioThroughRepository,
+  ) { }
 
   @post('/posts', {
     responses: {
@@ -43,7 +50,7 @@ export class PostController {
         'application/json': {
           schema: getModelSchemaRef(Post, {
             title: 'NewPost',
-            exclude: ['id', 'photos', 'documents', 'videos', 'audio'],
+            exclude: ['id', 'photos', 'documents', 'videos', 'audios'],
           }),
         },
       },
@@ -85,7 +92,37 @@ export class PostController {
   async find(
     @param.filter(Post) filter?: Filter<Post>,
   ): Promise<Post[]> {
-    return this.postRepository.find(filter);
+    const posts = await this.postRepository.find(filter);
+    // load through relations
+    for (const post of posts) {
+      if (!post.photos) {
+        post.photos = [];
+      }
+      post.photos = post.photos.concat(await this.postRepository.photosThrough(post.id).find())
+
+
+      if (!post.audios) {
+        post.audios = [];
+      }
+      post.audios = post.audios.concat(await this.postRepository.audioThrough(post.id).find())
+
+
+      if (!post.videos) {
+        post.videos = [];
+      }
+      post.videos = post.videos.concat(await this.postRepository.videosThrough(post.id).find())
+
+
+      if (!post.documents) {
+        post.documents = [];
+      }
+      post.documents = post.documents.concat(await this.postRepository.documentsThrough(post.id).find())
+
+
+    }
+    console.log();
+    // })
+    return posts;
   }
 
   @patch('/posts', {

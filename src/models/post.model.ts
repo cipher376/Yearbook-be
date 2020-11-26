@@ -2,13 +2,15 @@ import {belongsTo, Entity, hasMany, hasOne, model, property} from '@loopback/rep
 import {Audio} from './audio.model';
 import {Document} from './document.model';
 import {Photo} from './photo.model';
+import {PostAudioThrough} from './post-audio-through.model';
 import {PostConfig} from './post-config.model';
-import {User} from './user.model';
-import {Video} from './video.model';
+import {PostDocumentThrough} from './post-document-through.model';
 import {PostPhotoThrough} from './post-photo-through.model';
 import {PostVideoThrough} from './post-video-through.model';
-import {PostAudioThrough} from './post-audio-through.model';
-import {PostDocumentThrough} from './post-document-through.model';
+import {User} from './user.model';
+import {Video} from './video.model';
+import {Comment} from './comment.model';
+import {LikeThrough} from './like-through.model';
 
 @model()
 export class Post extends Entity {
@@ -30,11 +32,17 @@ export class Post extends Entity {
   })
   message: string;
 
+  @property({
+    type: 'date',
+    defaultFn: 'now',
+  })
+  dateCreated?: Date;
+
   @belongsTo(() => User)
   userId: number;
 
   @hasMany(() => Audio)
-  audio: Audio[];
+  audios: Audio[];
 
   @hasMany(() => Video)
   videos: Video[];
@@ -69,6 +77,12 @@ export class Post extends Entity {
 
   @hasMany(() => Document, {through: {model: () => PostDocumentThrough}})
   documentsThrough: Document[];
+
+  @hasMany(() => Comment)
+  comments: Comment[];
+
+  @hasMany(() => User, {through: {model: () => LikeThrough, keyFrom: 'receiverId', keyTo: 'initiatorId'}})
+  likedUsers: User[];
 
   constructor(data?: Partial<Post>) {
     super(data);

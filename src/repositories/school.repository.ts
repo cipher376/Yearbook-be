@@ -1,16 +1,17 @@
 import {Getter, inject} from '@loopback/core';
 import {DefaultCrudRepository, HasManyRepositoryFactory, HasManyThroughRepositoryFactory, HasOneRepositoryFactory, repository} from '@loopback/repository';
 import {DbDataSource} from '../datasources';
-import {Address, Alumni, Audio, Document, Photo, School, SchoolDetails, SchoolRelations, User, Video, Post} from '../models';
+import {Address, Alumni, Audio, Document, FollowThrough, Photo, Post, School, SchoolDetails, SchoolRelations, User, Video} from '../models';
 import {AddressRepository} from './address.repository';
 import {AlumniRepository} from './alumni.repository';
 import {AudioRepository} from './audio.repository';
 import {DocumentRepository} from './document.repository';
+import {FollowThroughRepository} from './follow-through.repository';
 import {PhotoRepository} from './photo.repository';
+import {PostRepository} from './post.repository';
 import {SchoolDetailsRepository} from './school-details.repository';
 import {UserRepository} from './user.repository';
 import {VideoRepository} from './video.repository';
-import {PostRepository} from './post.repository';
 
 export class SchoolRepository extends DefaultCrudRepository<
   School,
@@ -39,6 +40,11 @@ export class SchoolRepository extends DefaultCrudRepository<
 
   public readonly posts: HasManyRepositoryFactory<Post, typeof School.prototype.id>;
 
+  public readonly followers: HasManyThroughRepositoryFactory<User, typeof User.prototype.id,
+    FollowThrough,
+    typeof School.prototype.id
+  >;
+
   constructor(
     @inject('datasources.db') dataSource: DbDataSource,
     @repository.getter('AlumniRepository') protected alumniRepositoryGetter: Getter<AlumniRepository>,
@@ -48,9 +54,11 @@ export class SchoolRepository extends DefaultCrudRepository<
     @repository.getter('VideoRepository') protected videoRepositoryGetter: Getter<VideoRepository>,
     @repository.getter('AudioRepository') protected audioRepositoryGetter: Getter<AudioRepository>,
     @repository.getter('DocumentRepository') protected documentRepositoryGetter: Getter<DocumentRepository>,
-    @repository.getter('UserRepository') protected userRepositoryGetter: Getter<UserRepository>, @repository.getter('PostRepository') protected postRepositoryGetter: Getter<PostRepository>,
+    @repository.getter('UserRepository') protected userRepositoryGetter: Getter<UserRepository>, @repository.getter('PostRepository') protected postRepositoryGetter: Getter<PostRepository>, @repository.getter('FollowThroughRepository') protected followThroughRepositoryGetter: Getter<FollowThroughRepository>,
   ) {
     super(School, dataSource);
+    this.followers = this.createHasManyThroughRepositoryFactoryFor('followers', userRepositoryGetter, followThroughRepositoryGetter,);
+    // this.registerInclusionResolver('followers', this.followers.inclusionResolver);
     this.posts = this.createHasManyRepositoryFactoryFor('posts', postRepositoryGetter,);
     this.registerInclusionResolver('posts', this.posts.inclusionResolver);
     this.users = this.createHasManyThroughRepositoryFactoryFor('users', userRepositoryGetter, alumniRepositoryGetter,);

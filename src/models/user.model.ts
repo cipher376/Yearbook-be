@@ -1,13 +1,17 @@
 import {Entity, hasMany, hasOne, model, property} from '@loopback/repository';
 import {Address} from './address.model';
+import {Alumni} from './alumni.model';
+import {Audio} from './audio.model';
+import {Comment} from './comment.model';
+import {Document} from './document.model';
+import {FollowThrough} from './follow-through.model';
+import {FriendshipThrough} from './friendship-through.model';
+import {LikeThrough} from './like-through.model';
 import {Photo} from './photo.model';
 import {Post} from './post.model';
-import {UserConfig} from './user-config.model';
 import {School} from './school.model';
-import {Alumni} from './alumni.model';
+import {UserConfig} from './user-config.model';
 import {Video} from './video.model';
-import {Audio} from './audio.model';
-import {Document} from './document.model';
 
 @model()
 export class User extends Entity {
@@ -149,6 +153,42 @@ export class User extends Entity {
 
   @hasMany(() => Document)
   documents: Document[];
+
+  @hasMany(() => Comment, {keyTo: 'initiatorId'})
+  comments: Comment[];
+
+  @hasMany(() => User, {
+    through: {
+      model: () => FriendshipThrough,
+      keyFrom: 'initiatorId',
+      keyTo: 'acceptorId',
+    },
+  })
+  friends: User[];
+
+  @hasMany(() => User, {
+    through: {
+      model: () => FollowThrough,
+      keyFrom: 'leaderId',
+      keyTo: 'followerId',
+    },
+  })
+  followers: User[];
+
+  @hasMany(() => User, {
+    through: {
+      model: () => FollowThrough,
+      keyFrom: 'followerId',
+      keyTo: 'leaderId',
+    },
+  })
+  leaders: User[];
+
+  @hasMany(() => Comment, {through: {model: () => LikeThrough, keyFrom: 'initiatorId', keyTo: 'receiverId'}})
+  likedComments: Comment[];
+
+  @hasMany(() => School, {through: {model: () => FollowThrough, keyFrom: 'followerId', keyTo: 'leaderId'}})
+  followedSchools: School[];
 
   constructor(data?: Partial<User>) {
     super(data);

@@ -8,6 +8,7 @@ import {Video} from './video.model';
 import {User} from './user.model';
 import {Alumni} from './alumni.model';
 import {Post} from './post.model';
+import {FollowThrough} from './follow-through.model';
 
 @model()
 export class School extends Entity {
@@ -68,6 +69,9 @@ export class School extends Entity {
 
   @hasMany(() => Post)
   posts: Post[];
+
+  @hasMany(() => User, {through: {model: () => FollowThrough, keyFrom: 'leaderId', keyTo: 'followerId'}})
+  followers: User[];
 
   constructor(data?: Partial<School>) {
     super(data);
