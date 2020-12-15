@@ -1,27 +1,33 @@
 import {assignInstanceId} from '../services/casbin-authorization';
 
-const RESOURCE_NAME = 'address';
+const RESOURCE_NAME = 'follow';
 
-export const ACL_ADDRESS = {
+export const ACL_FOLLOW = {
+  create: {
+    resource: RESOURCE_NAME,
+    scopes: ['create'],
+    allowedRoles: ['authUser'],
+  },
   count: {
     resource: RESOURCE_NAME,
     scopes: ['count'],
-    allowedRoles: ['admin'],
+    allowedRoles: [],
   },
   'list-all': {
     resource: RESOURCE_NAME,
     scopes: ['list-all'],
-    allowedRoles: ['admin'],
+    allowedRoles: [],
   },
-  'update-all': {
-    resource: RESOURCE_NAME,
-    scopes: ['update-all'],
-    allowedRoles: ['admin'],
-  },
+
+  // 'update-all': {
+  //   resource: RESOURCE_NAME,
+  //   scopes: ['update-all'],
+  //   allowedRoles: ['admin', 'schoolAdmin', 'owner'],
+  // },
   'find-by-id': {
     resource: RESOURCE_NAME,
     scopes: ['find-by-id'],
-    allowedRoles: ['admin'],
+    allowedRoles: [],
     voters: [assignInstanceId],
   },
   'update-by-id': {
@@ -30,22 +36,17 @@ export const ACL_ADDRESS = {
     allowedRoles: ['admin', 'authUser'], // owner
     voters: [assignInstanceId],
   },
-  'replace-by-id': {
-    resource: RESOURCE_NAME,
-    scopes: ['replace-by-id'],
-    allowedRoles: ['admin'],
-    voters: [assignInstanceId],
-  },
+  // 'replace-by-id': {
+  //   resource: RESOURCE_NAME,
+  //   scopes: ['replace-by-id'],
+  //   allowedRoles: ['admin'],
+  //   voters: [assignInstanceId],
+  // },
+
   'delete-by-id': {
     resource: RESOURCE_NAME,
     scopes: ['delete-by-id'],
     allowedRoles: ['admin'],
     voters: [assignInstanceId],
-  },
-  'create-many': {
-    resource: RESOURCE_NAME,
-    scopes: ['create-many'],
-    allowedRoles: ['admin'],
-    voters: [assignInstanceId],
   }
-}
+};

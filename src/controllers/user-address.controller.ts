@@ -1,4 +1,5 @@
 import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {
   Count,
   CountSchema,
@@ -16,13 +17,14 @@ import {
   post,
   requestBody
 } from '@loopback/rest';
+import {ACL_USER_ADDRESS} from '../acls/user-address.acl';
 import {Address, User} from '../models';
 import {UserRepository} from '../repositories';
 
 export class UserAddressController {
   constructor(
     @repository(UserRepository) protected userRepository: UserRepository,
-  ) {}
+  ) { }
 
   @get('/users/{id}/address', {
     responses: {
@@ -36,7 +38,7 @@ export class UserAddressController {
       },
     },
   })
-  @authenticate("jwt")
+  // @authenticate("jwt")
   // @authorize(ACL_USER_ADDRESS['list-all'])
   async get(
     @param.path.number('id') id: number,
@@ -54,7 +56,7 @@ export class UserAddressController {
     },
   })
   @authenticate("jwt")
-  // @authorize(ACL_USER_ADDRESS['create'])
+  @authorize(ACL_USER_ADDRESS['create'])
   async create(
     @param.path.number('id') id: typeof User.prototype.id,
     @requestBody({
@@ -81,7 +83,7 @@ export class UserAddressController {
     },
   })
   @authenticate("jwt")
-  // @authorize(ACL_USER_ADDRESS['update-by-id'])
+  @authorize(ACL_USER_ADDRESS['update-by-id'])
   async patch(
     @param.path.number('id') id: number,
     @requestBody({
@@ -106,7 +108,7 @@ export class UserAddressController {
     },
   })
   @authenticate("jwt")
-  // @authorize(ACL_USER_ADDRESS['delete-by-id'])
+  @authorize(ACL_USER_ADDRESS['delete-by-id'])
   async delete(
     @param.path.number('id') id: number,
     @param.query.object('where', getWhereSchemaFor(Address)) where?: Where<Address>,

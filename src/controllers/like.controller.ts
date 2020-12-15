@@ -1,3 +1,5 @@
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {
   Count,
   CountSchema,
@@ -9,17 +11,10 @@ import {
 import {
   del, get,
   getModelSchemaRef, param,
-
-
   patch, post,
-
-
-
-
-
-
   requestBody
 } from '@loopback/rest';
+import {ACL_LIKE} from '../acls/like.acl';
 import {LikeThrough} from '../models';
 import {LikeThroughRepository} from '../repositories';
 
@@ -37,6 +32,8 @@ export class LikeController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_LIKE['create'])
   async create(
     @requestBody({
       content: {
@@ -141,6 +138,8 @@ export class LikeController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_LIKE['update-by-id'])
   async updateById(
     @param.path.number('id') id: number,
     @requestBody({
@@ -168,7 +167,8 @@ export class LikeController {
   // ): Promise<void> {
   //   await this.likeThroughRepository.replaceById(id, likeThrough);
   // }
-
+  @authenticate("jwt")
+  @authorize(ACL_LIKE['delete-by-id'])
   @del('/likes/{id}', {
     responses: {
       '204': {

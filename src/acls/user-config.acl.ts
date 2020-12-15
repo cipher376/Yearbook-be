@@ -1,8 +1,8 @@
 import {assignInstanceId} from '../services/casbin-authorization';
 
-const RESOURCE_NAME = 'user_address';
+const RESOURCE_NAME = 'user_config';
 
-export const ACL_USER_ADDRESS = {
+export const ACL_USER_CONFIG = {
   create: {
     resource: RESOURCE_NAME,
     scopes: ['create'],
@@ -12,14 +12,14 @@ export const ACL_USER_ADDRESS = {
   'list-all': {
     resource: RESOURCE_NAME,
     scopes: ['list-all'],
-    allowedRoles: [],
+    allowedRoles: ['admin'],
     voters: [assignInstanceId],
 
   },
   'update-by-id': {
     resource: RESOURCE_NAME,
     scopes: ['update-by-id'],
-    allowedRoles: ['admin', 'authUser'], //owner
+    allowedRoles: ['admin', 'authUser'],  // owner
     voters: [assignInstanceId],
   },
 

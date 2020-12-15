@@ -12,7 +12,7 @@ export const ACL_SCHOOL_ADDRESS = {
   'list-all': {
     resource: RESOURCE_NAME,
     scopes: ['list-all'],
-    allowedRoles: ['admin', 'authUser'],
+    allowedRoles: [],
   },
   'update-by-id': {
     resource: RESOURCE_NAME,

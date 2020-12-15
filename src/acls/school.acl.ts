@@ -11,22 +11,22 @@ export const ACL_SCHOOL = {
   count: {
     resource: RESOURCE_NAME,
     scopes: ['count'],
-    allowedRoles: ['authUser'],
+    allowedRoles: [],
   },
   'list-all': {
     resource: RESOURCE_NAME,
     scopes: ['list-all'],
-    allowedRoles: ['anonymous'],
+    allowedRoles: [],
   },
   'update-all': {
     resource: RESOURCE_NAME,
     scopes: ['update-all'],
-    allowedRoles: ['admin', 'schoolAdmin'],
+    allowedRoles: ['admin'],
   },
   'find-by-id': {
     resource: RESOURCE_NAME,
     scopes: ['find-by-id'],
-    allowedRoles: ['anonymous'],
+    allowedRoles: [],
     voters: [assignInstanceId],
   },
   'update-by-id': {

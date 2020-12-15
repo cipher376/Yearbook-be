@@ -1,4 +1,5 @@
 import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {
   Count,
   CountSchema,
@@ -9,16 +10,17 @@ import {
 } from '@loopback/repository';
 import {
   get,
-  getModelSchemaRef, param, post, requestBody
+  getModelSchemaRef, param, patch, post, requestBody
 } from '@loopback/rest';
 import {Address} from '../models';
 import {AddressRepository} from '../repositories';
+import {ACL_ADDRESS} from './../acls/address.acl';
 
 export class AddressController {
   constructor(
     @repository(AddressRepository)
     public addressRepository: AddressRepository,
-  ) {}
+  ) { }
 
   @post('/addresses', {
     responses: {
@@ -60,6 +62,8 @@ export class AddressController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_ADDRESS['create-many'])
   async createMany(
     @requestBody({
       content: {
@@ -91,7 +95,7 @@ export class AddressController {
     },
   })
   @authenticate("jwt")
-  // @authorize(ACL_ADDRESS['count'])
+  @authorize(ACL_ADDRESS['count'])
   async count(
     @param.where(Address) where?: Where<Address>,
   ): Promise<Count> {
@@ -158,7 +162,7 @@ export class AddressController {
     },
   })
   @authenticate("jwt")
-  // @authorize(ACL_ADDRESS['find-by-id'])
+  @authorize(ACL_ADDRESS['find-by-id'])
   async findById(
     @param.path.number('id') id: number,
     @param.filter(Address, {exclude: 'where'}) filter?: FilterExcludingWhere<Address>
@@ -166,28 +170,28 @@ export class AddressController {
     return this.addressRepository.findById(id, filter);
   }
 
-  // @patch('/addresses/{id}', {
-  //   responses: {
-  //     '204': {
-  //       description: 'Address PATCH success',
-  //     },
-  //   },
-  // })
-  // @authenticate("jwt")
-  // @authorize(ACL_ADDRESS['update-by-id'])
-  // async updateById(
-  //   @param.path.number('id') id: number,
-  //   @requestBody({
-  //     content: {
-  //       'application/json': {
-  //         schema: getModelSchemaRef(Address, {partial: true}),
-  //       },
-  //     },
-  //   })
-  //   address: Address,
-  // ): Promise<void> {
-  //   await this.addressRepository.updateById(id, address);
-  // }
+  @patch('/addresses/{id}', {
+    responses: {
+      '204': {
+        description: 'Address PATCH success',
+      },
+    },
+  })
+  @authenticate("jwt")
+  @authorize(ACL_ADDRESS['update-by-id'])
+  async updateById(
+    @param.path.number('id') id: number,
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(Address, {partial: true}),
+        },
+      },
+    })
+    address: Address,
+  ): Promise<void> {
+    await this.addressRepository.updateById(id, address);
+  }
 
   // @put('/addresses/{id}', {
   //   responses: {

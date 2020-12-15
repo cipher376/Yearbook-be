@@ -1,4 +1,5 @@
 import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {
   repository
 } from '@loopback/repository';
@@ -12,6 +13,7 @@ import {
 
   requestBody
 } from '@loopback/rest';
+import {ACL_POST_AUDIO} from '../acls/post-audio.acl';
 import {PostAudioThrough} from '../models';
 import {PostAudioThroughRepository} from '../repositories';
 
@@ -30,6 +32,7 @@ export class PostAudioThroughController {
     },
   })
   @authenticate("jwt")
+  @authorize(ACL_POST_AUDIO['create'])
   async create(
     @requestBody({
       content: {
@@ -61,7 +64,7 @@ export class PostAudioThroughController {
     }
   })
   @authenticate("jwt")
-  // @authorize(ACL_USER['create-many'])
+  @authorize(ACL_POST_AUDIO['create'])
   async createMany(
     @requestBody({
       content: {
@@ -200,6 +203,7 @@ export class PostAudioThroughController {
     },
   })
   @authenticate("jwt")
+  @authorize(ACL_POST_AUDIO['delete-by-id'])
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.postAudioThroughRepository.deleteById(id);
   }

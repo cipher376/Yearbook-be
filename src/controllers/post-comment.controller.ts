@@ -1,3 +1,5 @@
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {
   Count,
   CountSchema,
@@ -6,14 +8,16 @@ import {
   Where
 } from '@loopback/repository';
 import {
+  del,
   get,
   getModelSchemaRef,
   getWhereSchemaFor,
   param,
-  patch,
+
   post,
   requestBody
 } from '@loopback/rest';
+import {ACL_COMMENT} from '../acls/comment.acl';
 import {
   Comment, Post
 } from '../models';
@@ -69,6 +73,8 @@ export class PostCommentController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_COMMENT['create'])
   async create(
     @param.path.number('id') id: typeof Post.prototype.id,
     @requestBody({
@@ -86,41 +92,43 @@ export class PostCommentController {
     return this.postRepository.comments(id).create(comment);
   }
 
-  @patch('/posts/{id}/comments', {
-    responses: {
-      '200': {
-        description: 'Post.Comment PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  async patch(
-    @param.path.number('id') id: number,
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Comment, {partial: true}),
-        },
-      },
-    })
-    comment: Partial<Comment>,
-    @param.query.object('where', getWhereSchemaFor(Comment)) where?: Where<Comment>,
-  ): Promise<Count> {
-    return this.postRepository.comments(id).patch(comment, where);
-  }
-
-  // @del('/posts/{id}/comments', {
+  // @patch('/posts/{id}/comments', {
   //   responses: {
   //     '200': {
-  //       description: 'Post.Comment DELETE success count',
+  //       description: 'Post.Comment PATCH success count',
   //       content: {'application/json': {schema: CountSchema}},
   //     },
   //   },
   // })
-  // async delete(
+  // async patch(
   //   @param.path.number('id') id: number,
+  //   @requestBody({
+  //     content: {
+  //       'application/json': {
+  //         schema: getModelSchemaRef(Comment, {partial: true}),
+  //       },
+  //     },
+  //   })
+  //   comment: Partial<Comment>,
   //   @param.query.object('where', getWhereSchemaFor(Comment)) where?: Where<Comment>,
   // ): Promise<Count> {
-  //   return this.postRepository.comments(id).delete(where);
+  //   return this.postRepository.comments(id).patch(comment, where);
   // }
+
+  @del('/posts/{id}/comments', {
+    responses: {
+      '200': {
+        description: 'Post.Comment DELETE success count',
+        content: {'application/json': {schema: CountSchema}},
+      },
+    },
+  })
+  @authenticate("jwt")
+  @authorize(ACL_COMMENT['delete-by-id'])
+  async delete(
+    @param.path.number('id') id: number,
+    @param.query.object('where', getWhereSchemaFor(Comment)) where?: Where<Comment>,
+  ): Promise<Count> {
+    return this.postRepository.comments(id).delete(where);
+  }
 }

@@ -29,7 +29,7 @@ export class LikeThrough extends Entity {
   @property({
     type: 'string',
   })
-  receiverName?: string;
+  receiverName?: string; // School or User or comment
 
 
 

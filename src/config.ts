@@ -4,7 +4,12 @@ import {ApplicationConfig} from '.';
 const originsWhitelist = [
   'http://localhost:8100',      //this is my front-end url for development
   'http://www.devtek-limited.com',
-  'http://www.devtek-limited.tech'
+  'http://www.devtek-limited.tech',
+  'http://yearbook-api.devtek-limited.tech',
+  'https://localhost:8100',      //this is my front-end url for development
+  'https://www.devtek-limited.com',
+  'https://www.devtek-limited.tech',
+  'https://yearbook-api.devtek-limited.tech'
 ];
 
 
@@ -31,11 +36,12 @@ export const APP_CONFIG: ApplicationConfig =
       callback(null, isWhitelisted);
     },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    preflightContinue: false,
+    preflightContinue: true,
     optionsSuccessStatus: 204,
     maxAge: 86400,
     credentials: true,
-    exposedHeaders: ['Content-Length', 'Cache-Control', 'Content-Language', 'Content-Type', 'Expires', 'Last-Modified', 'Authorization']
+    exposedHeaders: ['Content-Length', 'Cache-Control', 'Content-Language', 'Content-Type', 'Expires',
+      'Last-Modified', 'Authorization', 'Access-Control-Allow-Origin']
   }
 };
 

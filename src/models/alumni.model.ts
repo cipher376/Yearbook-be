@@ -1,5 +1,7 @@
 import {Entity, hasOne, model, property} from '@loopback/repository';
 import {Degree} from './degree.model';
+import {School} from './school.model';
+import {User} from './user.model';
 
 @model()
 export class Alumni extends Entity {
@@ -39,6 +41,12 @@ export class Alumni extends Entity {
     type: 'number',
   })
   userId?: number;
+
+  @hasOne(() => School)
+  school: School;
+
+  @hasOne(() => User)
+  user: User;
 
   constructor(data?: Partial<Alumni>) {
     super(data);

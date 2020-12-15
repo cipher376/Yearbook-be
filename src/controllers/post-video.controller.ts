@@ -1,11 +1,13 @@
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {
   Count,
   CountSchema,
   Filter,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
-  import {
+import {
   del,
   get,
   getModelSchemaRef,
@@ -13,12 +15,13 @@ import {
   param,
   patch,
   post,
-  requestBody,
+  requestBody
 } from '@loopback/rest';
+import {ACL_MEDIA} from '../acls/media.acl';
 import {
-Post,
-PostVideoThrough,
-Video,
+  Post,
+
+  Video
 } from '../models';
 import {PostRepository} from '../repositories';
 
@@ -39,6 +42,8 @@ export class PostVideoController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_MEDIA['list-all'])
   async find(
     @param.path.number('id') id: number,
     @param.query.object('filter') filter?: Filter<Video>,
@@ -54,6 +59,8 @@ export class PostVideoController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_MEDIA['create'])
   async create(
     @param.path.number('id') id: typeof Post.prototype.id,
     @requestBody({
@@ -78,6 +85,8 @@ export class PostVideoController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_MEDIA['update-by-id'])
   async patch(
     @param.path.number('id') id: number,
     @requestBody({
@@ -101,6 +110,8 @@ export class PostVideoController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_MEDIA['delete-by-id'])
   async delete(
     @param.path.number('id') id: number,
     @param.query.object('where', getWhereSchemaFor(Video)) where?: Where<Video>,

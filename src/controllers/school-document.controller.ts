@@ -1,4 +1,5 @@
 import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {
   Count,
   CountSchema,
@@ -16,6 +17,7 @@ import {
   post,
   requestBody
 } from '@loopback/rest';
+import {ACL_SCHOOL_DOCUMENT} from '../acls/school-document.acl';
 import {
   Document, School
 } from '../models';
@@ -24,7 +26,7 @@ import {SchoolRepository} from '../repositories';
 export class SchoolDocumentController {
   constructor(
     @repository(SchoolRepository) protected schoolRepository: SchoolRepository,
-  ) {}
+  ) { }
 
   @get('/schools/{id}/documents', {
     responses: {
@@ -39,7 +41,7 @@ export class SchoolDocumentController {
     },
   })
   @authenticate("jwt")
-  // @authorize(ACL_SCHOOL_DOCUMENT['list-all'])
+  @authorize(ACL_SCHOOL_DOCUMENT['list-all'])
   async find(
     @param.path.number('id') id: number,
     @param.query.object('filter') filter?: Filter<Document>,
@@ -56,7 +58,7 @@ export class SchoolDocumentController {
     },
   })
   @authenticate("jwt")
-  // @authorize(ACL_SCHOOL_DOCUMENT['create'])
+  @authorize(ACL_SCHOOL_DOCUMENT['create'])
   async create(
     @param.path.number('id') id: typeof School.prototype.id,
     @requestBody({
@@ -108,7 +110,7 @@ export class SchoolDocumentController {
     },
   })
   @authenticate("jwt")
-  // @authorize(ACL_SCHOOL_DOCUMENT['delete-by-id'])
+  @authorize(ACL_SCHOOL_DOCUMENT['delete-by-id'])
   async delete(
     @param.path.number('id') id: number,
     @param.query.object('where', getWhereSchemaFor(Document)) where?: Where<Document>,

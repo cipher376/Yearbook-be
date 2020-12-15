@@ -1,3 +1,5 @@
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {
   Filter,
   repository
@@ -14,6 +16,7 @@ import {
   User
 } from '../models';
 import {PostRepository} from '../repositories';
+import {ACL_USER} from './../acls/user.acl';
 
 export class PostUserController {
   constructor(
@@ -52,6 +55,8 @@ export class PostUserController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_USER['find-by-id'])
   async getUser(
     @param.path.number('id') id: typeof Post.prototype.id,
   ): Promise<User> {

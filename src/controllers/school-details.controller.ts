@@ -1,3 +1,5 @@
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {
   repository
 } from '@loopback/repository';
@@ -13,12 +15,13 @@ import {
 } from '@loopback/rest';
 import {SchoolDetails} from '../models';
 import {SchoolDetailsRepository} from '../repositories';
+import {ACL_SCHOOL_DETAILS} from './../acls/school-school-details.acl';
 
 export class SchoolDetailsController {
   constructor(
     @repository(SchoolDetailsRepository)
     public schoolDetailsRepository: SchoolDetailsRepository,
-  ) {}
+  ) { }
 
   @post('/school-details-create-many', {
     responses: {
@@ -28,6 +31,8 @@ export class SchoolDetailsController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_SCHOOL_DETAILS['create'])
   async createMany(
     @requestBody({
       content: {

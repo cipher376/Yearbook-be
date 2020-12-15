@@ -1,4 +1,5 @@
 import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {
   Count,
   CountSchema,
@@ -12,10 +13,11 @@ import {
   getModelSchemaRef,
   getWhereSchemaFor,
   param,
-  patch,
+
   post,
   requestBody
 } from '@loopback/rest';
+import {ACL_USER_PHOTO} from '../acls/user-photo.acl';
 import {
   Photo, User
 } from '../models';
@@ -24,7 +26,7 @@ import {UserRepository} from '../repositories';
 export class UserPhotoController {
   constructor(
     @repository(UserRepository) protected userRepository: UserRepository,
-  ) {}
+  ) { }
 
   @get('/users/{id}/photos', {
     responses: {
@@ -38,7 +40,7 @@ export class UserPhotoController {
       },
     },
   })
-  @authenticate("jwt")
+  // @authenticate("jwt")
   // @authorize(ACL_USER_PHOTO['list-all'])
   async find(
     @param.path.number('id') id: number,
@@ -56,7 +58,7 @@ export class UserPhotoController {
     },
   })
   @authenticate("jwt")
-  // @authorize(ACL_USER_PHOTO['list-all'])
+  @authorize(ACL_USER_PHOTO['list-all'])
   async create(
     @param.path.number('id') id: typeof User.prototype.id,
     @requestBody({
@@ -74,30 +76,30 @@ export class UserPhotoController {
     return this.userRepository.photos(id).create(photo);
   }
 
-  @patch('/users/{id}/photos', {
-    responses: {
-      '200': {
-        description: 'User.Photo PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  @authenticate("jwt")
+  // @patch('/users/{id}/photos', {
+  //   responses: {
+  //     '200': {
+  //       description: 'User.Photo PATCH success count',
+  //       content: {'application/json': {schema: CountSchema}},
+  //     },
+  //   },
+  // })
+  // @authenticate("jwt")
   // @authorize(ACL_USER_PHOTO['update-by-id'])
-  async patch(
-    @param.path.number('id') id: number,
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Photo, {partial: true}),
-        },
-      },
-    })
-    photo: Partial<Photo>,
-    @param.query.object('where', getWhereSchemaFor(Photo)) where?: Where<Photo>,
-  ): Promise<Count> {
-    return this.userRepository.photos(id).patch(photo, where);
-  }
+  // async patch(
+  //   @param.path.number('id') id: number,
+  //   @requestBody({
+  //     content: {
+  //       'application/json': {
+  //         schema: getModelSchemaRef(Photo, {partial: true}),
+  //       },
+  //     },
+  //   })
+  //   photo: Partial<Photo>,
+  //   @param.query.object('where', getWhereSchemaFor(Photo)) where?: Where<Photo>,
+  // ): Promise<Count> {
+  //   return this.userRepository.photos(id).patch(photo, where);
+  // }
 
   @del('/users/{id}/photos', {
     responses: {
@@ -108,7 +110,7 @@ export class UserPhotoController {
     },
   })
   @authenticate("jwt")
-  // @authorize(ACL_USER_PHOTO['delete-by-id'])
+  @authorize(ACL_USER_PHOTO['delete-by-id'])
   async delete(
     @param.path.number('id') id: number,
     @param.query.object('where', getWhereSchemaFor(Photo)) where?: Where<Photo>,

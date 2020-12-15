@@ -12,7 +12,7 @@ export const ACL_SCHOOL_DETAILS = {
   'list-all': {
     resource: RESOURCE_NAME,
     scopes: ['list-all'],
-    allowedRoles: ['anonymous'],
+    allowedRoles: [],
     voters: [assignInstanceId],
   },
   'update-by-id': {

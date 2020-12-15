@@ -1,19 +1,15 @@
 import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization/dist/decorators/authorize';
 import {
   repository
 } from '@loopback/repository';
 import {
   del, getModelSchemaRef, param, post,
-
-
-
-
-
-
   requestBody
 } from '@loopback/rest';
 import {PostVideoThrough} from '../models';
 import {PostVideoThroughRepository} from '../repositories';
+import {ACL_MEDIA} from './../acls/media.acl';
 
 export class PostVideoThroughController {
   constructor(
@@ -29,6 +25,8 @@ export class PostVideoThroughController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_MEDIA['create'])
   async create(
     @requestBody({
       content: {
@@ -60,7 +58,7 @@ export class PostVideoThroughController {
     }
   })
   @authenticate("jwt")
-  // @authorize(ACL_USER['create-many'])
+  @authorize(ACL_MEDIA['create'])
   async createMany(
     @requestBody({
       content: {
@@ -197,6 +195,8 @@ export class PostVideoThroughController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_MEDIA['delete-by-id'])
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.postVideoThroughRepository.deleteById(id);
   }

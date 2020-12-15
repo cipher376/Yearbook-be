@@ -12,14 +12,14 @@ export const ACL_SCHOOL_ALUMNI = {
   'list-all': {
     resource: RESOURCE_NAME,
     scopes: ['list-all'],
-    allowedRoles: ['authUser'],
+    allowedRoles: [],
     voters: [assignInstanceId],
 
   },
   'update-by-id': {
     resource: RESOURCE_NAME,
     scopes: ['update-by-id'],
-    allowedRoles: ['admin', 'schoolAdmin'],
+    allowedRoles: ['admin', 'schoolAdmin', 'authUser'], // owner
     voters: [assignInstanceId],
   },
 

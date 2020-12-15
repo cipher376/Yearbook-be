@@ -7,7 +7,7 @@ export const ACL_ALUMNI_USER = {
   'find-by-id': {
     resource: RESOURCE_NAME,
     scopes: ['find-by-id'],
-    allowedRoles: ['admin', 'owner'],
+    allowedRoles: ['authUser'],
     voters: [assignInstanceId],
   }
 }

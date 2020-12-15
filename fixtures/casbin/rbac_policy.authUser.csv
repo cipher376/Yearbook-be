@@ -1,29 +1,64 @@
+p, authUser, address, update-by-id --> new
 
-p, authUser, alumni_degree*, create
+p, authUser, alumni_degree, create
+p, authUser, alumni_degree, update-by-id -->
+p, authUser, alumni_degree, delete-by-id -->
 
-p, authUser, alumni*, create
-p, authUser, alumni*, count
+p, authUser, alumni, create
+p, authUser, alumni, update-by-id
+p, authUser, alumni, delete-by-id
 
-p, authUser, media*, create
-p, authUser, media*, count
-p, authUser, media*, upload
 
-p, authUser, photo*, create
-p, authUser, photo*, count
-p, authUser, photo*, find-by-id
 
-p, authUser, school_alumni*, create
-p, authUser, school_alumni*, list-all
+p, authUser, media, create
+p, authUser, media, upload
 
-p, authUser, school_audio*, create
+p, authUser, photo, create
+p, authUser, photo, update-by-id
+p, authUser, photo, delete-by-id
 
-p, authUser, school*, count
+p, authUser, school_alumni, create
+p, authUser, school_alumni, update-by-id
 
-p, authUser, user_address*, create
 
-p, authUser, user_photo*, create
+p, authUser, school_audio, create
 
-p, authUser, user*, find-by-id
-p, authUser, user*, list-all
+p, authUser, user_address, create
+p, authUser, user_address, update-by-id
+
+p, authUser, user_photo, create
+p, authUser, user_photo, update-by-id
+
+p, authUser, user, update-by-id
+p, authUser,  user, my-profile
+p, authUser, user, me
+
+p, authUser, alumni_degree, create
+p, authUser, alumni_degree, update-by-id
+p, authUser, alumni_user, delete-by-id
+
+p, authUser, comment, create
+
+p, authUser, follow, create
+p, authUser, follow, update-by-id
+
+p, authUser, like, create
+p, authUser, like, update-by-id
+
+p, authUser, post_audio, create
+p, authUser, post_audio, delete-by-id
+
+
+p, authUser, post_config, create
+p, authUser, post_config, update-by-id
+
+
+p, authUser, post, create
+
+p, authUser, school_audio, create
+
+
+p, authUser, user_config, create
+p, authUser, user_config, update-by-id
 
 g, u4, authUser

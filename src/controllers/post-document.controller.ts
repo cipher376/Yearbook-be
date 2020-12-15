@@ -1,11 +1,13 @@
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {
   Count,
   CountSchema,
   Filter,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
-  import {
+import {
   del,
   get,
   getModelSchemaRef,
@@ -13,12 +15,11 @@ import {
   param,
   patch,
   post,
-  requestBody,
+  requestBody
 } from '@loopback/rest';
+import {ACL_MEDIA} from '../acls/media.acl';
 import {
-Post,
-PostDocumentThrough,
-Document,
+  Document, Post
 } from '../models';
 import {PostRepository} from '../repositories';
 
@@ -54,6 +55,8 @@ export class PostDocumentController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_MEDIA['create'])
   async create(
     @param.path.number('id') id: typeof Post.prototype.id,
     @requestBody({
@@ -78,6 +81,8 @@ export class PostDocumentController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_MEDIA['update-by-id'])
   async patch(
     @param.path.number('id') id: number,
     @requestBody({
@@ -101,6 +106,8 @@ export class PostDocumentController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_MEDIA['delete-by-id'])
   async delete(
     @param.path.number('id') id: number,
     @param.query.object('where', getWhereSchemaFor(Document)) where?: Where<Document>,

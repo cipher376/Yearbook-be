@@ -1,4 +1,5 @@
 import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {
   Count,
   CountSchema,
@@ -16,6 +17,7 @@ import {
   post,
   requestBody
 } from '@loopback/rest';
+import {ACL_SCHOOL_ADDRESS} from '../acls/school-address.acl';
 import {Address, School} from '../models';
 import {SchoolRepository} from '../repositories';
 import {AddressRepository} from './../repositories/address.repository';
@@ -24,7 +26,7 @@ export class SchoolAddressController {
   constructor(
     @repository(SchoolRepository) protected schoolRepository: SchoolRepository,
     @repository(AddressRepository) protected addressRepository: AddressRepository,
-  ) {}
+  ) { }
 
   @get('/schools/{id}/address', {
     responses: {
@@ -38,8 +40,6 @@ export class SchoolAddressController {
       },
     },
   })
-  @authenticate("jwt")
-  // @authorize(ACL_SCHOOL_ADDRESS['list-all'])
   async get(
     @param.path.number('id') id: number,
     @param.query.object('filter') filter?: Filter<Address>,
@@ -56,7 +56,7 @@ export class SchoolAddressController {
     },
   })
   @authenticate("jwt")
-  // @authorize(ACL_SCHOOL_ADDRESS['create'])
+  @authorize(ACL_SCHOOL_ADDRESS['create'])
   async create(
     @param.path.number('id') id: typeof School.prototype.id,
     @requestBody({
@@ -83,7 +83,7 @@ export class SchoolAddressController {
     },
   })
   @authenticate("jwt")
-  // @authorize(ACL_SCHOOL_ADDRESS['update-by-id'])
+  @authorize(ACL_SCHOOL_ADDRESS['update-by-id'])
   async patch(
     @param.path.number('id') id: number,
     @requestBody({
@@ -108,7 +108,7 @@ export class SchoolAddressController {
     },
   })
   @authenticate("jwt")
-  // @authorize(ACL_SCHOOL_ADDRESS['delete-by-id'])
+  @authorize(ACL_SCHOOL_ADDRESS['delete-by-id'])
   async delete(
     @param.path.number('id') id: number,
     @param.query.object('where', getWhereSchemaFor(Address)) where?: Where<Address>,

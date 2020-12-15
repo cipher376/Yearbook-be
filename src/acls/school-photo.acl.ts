@@ -12,13 +12,13 @@ export const ACL_SCHOOL_PHOTO = {
   'list-all': {
     resource: RESOURCE_NAME,
     scopes: ['list-all'],
-    allowedRoles: ['anonymous'],
+    allowedRoles: [],
     voters: [assignInstanceId],
   },
   'update-by-id': {
     resource: RESOURCE_NAME,
     scopes: ['update-by-id'],
-    allowedRoles: ['admin', 'owner'],
+    allowedRoles: ['admin', 'schoolAdmin'],
     voters: [assignInstanceId],
   },
 

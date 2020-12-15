@@ -1,4 +1,5 @@
 import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {
   Count,
   CountSchema,
@@ -16,6 +17,7 @@ import {
   post,
   requestBody
 } from '@loopback/rest';
+import {ACL_SCHOOL_PHOTO} from '../acls/school-photo.acl';
 import {
   Photo, School
 } from '../models';
@@ -24,7 +26,7 @@ import {SchoolRepository} from '../repositories';
 export class SchoolPhotoController {
   constructor(
     @repository(SchoolRepository) protected schoolRepository: SchoolRepository,
-  ) {}
+  ) { }
 
   @get('/schools/{id}/photos', {
     responses: {
@@ -38,8 +40,6 @@ export class SchoolPhotoController {
       },
     },
   })
-  @authenticate("jwt")
-  // @authorize(ACL_SCHOOL_PHOTO['list-all'])
   async find(
     @param.path.number('id') id: number,
     @param.query.object('filter') filter?: Filter<Photo>,
@@ -56,7 +56,7 @@ export class SchoolPhotoController {
     },
   })
   @authenticate("jwt")
-  // @authorize(ACL_SCHOOL_PHOTO['create'])
+  @authorize(ACL_SCHOOL_PHOTO['create'])
   async create(
     @param.path.number('id') id: typeof School.prototype.id,
     @requestBody({
@@ -108,7 +108,7 @@ export class SchoolPhotoController {
     },
   })
   @authenticate("jwt")
-  // @authorize(ACL_SCHOOL_PHOTO['delete-by-id'])
+  @authorize(ACL_SCHOOL_PHOTO['delete-by-id'])
   async delete(
     @param.path.number('id') id: number,
     @param.query.object('where', getWhereSchemaFor(Photo)) where?: Where<Photo>,

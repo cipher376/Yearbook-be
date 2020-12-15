@@ -1,9 +1,11 @@
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {
   Count,
   CountSchema,
   Filter,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
 import {
   del,
@@ -13,11 +15,11 @@ import {
   param,
   patch,
   post,
-  requestBody,
+  requestBody
 } from '@loopback/rest';
+import {ACL_POST} from '../acls/post.acl';
 import {
-  School,
-  Post,
+  Post, School
 } from '../models';
 import {SchoolRepository} from '../repositories';
 
@@ -53,6 +55,8 @@ export class SchoolPostController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POST['create'])
   async create(
     @param.path.number('id') id: typeof School.prototype.id,
     @requestBody({
@@ -78,6 +82,8 @@ export class SchoolPostController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POST['update-by-id'])
   async patch(
     @param.path.number('id') id: number,
     @requestBody({
@@ -101,6 +107,8 @@ export class SchoolPostController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POST['delete-by-id'])
   async delete(
     @param.path.number('id') id: number,
     @param.query.object('where', getWhereSchemaFor(Post)) where?: Where<Post>,

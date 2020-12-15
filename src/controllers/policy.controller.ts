@@ -1,6 +1,9 @@
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {inject} from '@loopback/core';
-import {get, HttpErrors, patch, post, requestBody} from '@loopback/rest';
+import {get, getModelSchemaRef, HttpErrors, patch, post, requestBody} from '@loopback/rest';
 import * as casbin from 'casbin';
+import {ACL_POLICY} from '../acls/policy.acl';
 import {Policy} from '../models/policy.model';
 import {CasbinDbEnforcer} from './../services/casbin-authorization/casbin.enforcers';
 
@@ -12,7 +15,7 @@ export class PolicyController {
     @inject('casbin.enforcer.factory')
     private enforcerService: CasbinDbEnforcer,
   ) {
-    this.enforcer = enforcerService.enforcer();
+    this.enforcer = enforcerService.enforcerFactory();
   }
 
 
@@ -25,6 +28,8 @@ export class PolicyController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POLICY['count-policies'])
   async countPolicy(): Promise<number> {
     const result = ((await this.enforcer).getPolicy());
     return (await result)?.length;
@@ -38,6 +43,8 @@ export class PolicyController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POLICY['add-policy'])
   async addPolicy(
     @requestBody({
       description: 'Adds new policy rule to the database',
@@ -70,6 +77,8 @@ export class PolicyController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POLICY['add-policy'])
   async addPolicies(
     @requestBody({
       description: 'AddPolicies adds authorization rules to the current policy. The operation is atomic in nature. Hence, if authorization rules consists of rules which are not consistent with the current policy, the function returns false and no policy rule is added to the current policy. If all the authorization rules are consistent with the policy rules, the function returns true and each policy rule is added to the current policy.',
@@ -105,6 +114,8 @@ export class PolicyController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POLICY['remove-policy'])
   async removePolicy(
     @requestBody({
       description: 'RemovePolicy removes an authorization rule from the current policy.',
@@ -137,6 +148,8 @@ export class PolicyController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POLICY['remove-policy'])
   async removePolicies(
     @requestBody({
       description: `RemovePolicies removes authorization rules from the current policy.
@@ -180,6 +193,8 @@ export class PolicyController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POLICY['has-policy'])
   async hasPolicy(
     @requestBody({
       description: 'Check if policy rule already exist',
@@ -212,6 +227,8 @@ export class PolicyController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POLICY['has-policy'])
   async hasNamedPolicy(
     @requestBody({
       description: 'Check if policy rule already exist',
@@ -245,6 +262,8 @@ export class PolicyController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POLICY['has-policy'])
   async getAllSubjects(): Promise<string[]> {
     return (await this.enforcer).getAllSubjects();
   }
@@ -258,6 +277,8 @@ export class PolicyController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POLICY['list-subject'])
   async getAllNamedSubjects(
     @requestBody({
       description: "Submit the ptype value, default to 'p'",
@@ -284,6 +305,8 @@ export class PolicyController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POLICY['list-object'])
   async getAllObjects(): Promise<string[]> {
     return (await this.enforcer).getAllObjects();
   }
@@ -296,6 +319,8 @@ export class PolicyController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POLICY['list-object'])
   async getAllNamedObjects(
     @requestBody({
       description: "Submit the ptype value, default to 'p'",
@@ -321,6 +346,8 @@ export class PolicyController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POLICY['list-action'])
   async getAllActions(): Promise<string[]> {
     return (await this.enforcer).getAllActions();
   }
@@ -333,6 +360,8 @@ export class PolicyController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POLICY['list-action'])
   async getAllNamedActions(
     @requestBody({
       description: "Submit the ptype value, default to 'p'",
@@ -357,6 +386,8 @@ export class PolicyController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POLICY['list-role'])
   async getAllRoles(): Promise<string[]> {
     return (await this.enforcer).getAllRoles();
   }
@@ -370,6 +401,8 @@ export class PolicyController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POLICY['list-role'])
   async countRoles(): Promise<number> {
     const result = ((await this.enforcer).getGroupingPolicy());
     return (await result)?.length;
@@ -384,6 +417,8 @@ export class PolicyController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POLICY['list-role'])
   async getAllNamedRoles(
     @requestBody({
       description: "Submit the gtype value, e.g 'g'",
@@ -410,6 +445,8 @@ export class PolicyController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POLICY['list-policy'])
   async getPolicy(): Promise<Policy[]> {
     const result = (await this.enforcer).getPolicy();
     const policies: Policy[] = [];
@@ -433,14 +470,14 @@ export class PolicyController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POLICY['list-policy'])
   async getFilteredPolicy(
     @requestBody({
       description: "Submit the gtype value, default to 'g'",
       content: {
         'application/json': {
-          // schema: getModelSchemaRef(Policy, {
-          //   title: 'Check policy'
-          // }),
+          schema: getModelSchemaRef(Policy),
         },
       },
     }) filter: {subject: string, index?: number}
@@ -453,10 +490,13 @@ export class PolicyController {
     responses: {
       '200': {
         description: 'GetGroupingPolicy gets all the role inheritance rules in the policy.',
-        // content: {'application/json': {schema: getModelSchemaRef(Policy)}},
+        type: 'array',
+        "items": getModelSchemaRef(Policy)
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POLICY['list-policy'])
   async getGroupingPolicy(): Promise<Policy[]> {
     const result = (await this.enforcer).getGroupingPolicy();
     console.log(result);
@@ -479,14 +519,14 @@ export class PolicyController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POLICY['list-policy'])
   async getFilteredGroupingPolicy(
     @requestBody({
       description: "Submit the gtype value, default to 'g'",
       content: {
         'application/json': {
-          // schema: getModelSchemaRef(Policy, {
-          //   title: 'Check policy'
-          // }),
+          schema: getModelSchemaRef(Policy),
         },
       },
     }) filter: {subject: string, index?: number}
@@ -504,16 +544,16 @@ export class PolicyController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POLICY['list-policy'])
   async getNamedGroupingPolicy(
     @requestBody({
       description: "Submit the gtype value, default to 'g'",
-      // content: {
-      //   'application/json': {
-      // schema: getModelSchemaRef(Policy, {
-      //   title: 'Check policy'
-      // }),
-      // },
-      // },
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(Policy),
+        },
+      },
     })
     ptype: string
   ): Promise<string[][]> {
@@ -531,6 +571,8 @@ export class PolicyController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POLICY['add-policy'])
   async addGroupingPolicy(
     @requestBody({
       description: `AddGroupingPolicy adds a role inheritance rule to the current policy.
@@ -538,14 +580,13 @@ export class PolicyController {
       Otherwise the function returns true by adding the new rule.`,
       content: {
         'application/json': {
-          // schema: getModelSchemaRef(Policy, {
-          // title: 'new policy'
-          // }),
+          schema: getModelSchemaRef(Policy),
         },
       },
     })
     policy: Policy,
   ): Promise<Policy> {
+    console.log(policy);
     if (!policy.role) {
       throw new HttpErrors.UnprocessableEntity('Invalid policy object! Subject and role must be specified')
     }
@@ -553,7 +594,10 @@ export class PolicyController {
     }).catch(error => {
       console.debug(error);
     })
-    if (!await this.hasPolicy(policy)) {
+    const hasP = await this.hasPolicy(policy)
+    console.log('Testing');
+    console.log(hasP);
+    if (!hasP) {
       throw new HttpErrors.UnprocessableEntity('Policy object not valid!')
     }
     return policy;
@@ -569,6 +613,8 @@ export class PolicyController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POLICY['add-policy'])
   async addGroupingPolicies(
     @requestBody({
       description: `
@@ -578,13 +624,12 @@ export class PolicyController {
        returns false and no policy rule is added to the current policy. If all
        authorization the rules are consistent with the policy rules, the function
        returns true and each policy rule is added to the current policy.`,
-      // content: {
-      //   'application/json': {
-      //     schema: getModelSchemaRef(Policy, {
-      //       title: 'new policy'
-      //     }),
-      //   },
-      // },
+      content: {
+        'application/json': {
+          type: 'array',
+          "items": getModelSchemaRef(Policy)
+        },
+      },
     })
     policies: Policy[],
   ): Promise<Boolean> {
@@ -609,6 +654,8 @@ export class PolicyController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POLICY['add-policy'])
   async addNamedGroupingPolicy(
     @requestBody({
       description: `AddNamedGroupingPolicy adds a named role inheritance
@@ -617,9 +664,7 @@ export class PolicyController {
       returns true by adding the new rule.`,
       content: {
         'application/json': {
-          // schema: getModelSchemaRef(Policy, {
-          // title: 'new policy'
-          // }),
+          schema: getModelSchemaRef(Policy),
         },
       },
     })
@@ -648,6 +693,8 @@ export class PolicyController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POLICY['add-policy'])
   async addNamedGroupingPolicies(
     @requestBody({
       description: `
@@ -694,6 +741,8 @@ export class PolicyController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POLICY['remove-policy'])
   async removeGroupingPolicy(
     @requestBody({
       description: `RemoveGroupingPolicy removes a role
@@ -727,6 +776,8 @@ export class PolicyController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POLICY['remove-policy'])
   async removeGroupingPolicies(
     @requestBody({
       description: `RemoveGroupingPolicies removes role inheritance rules from
@@ -767,6 +818,8 @@ export class PolicyController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POLICY['add-policy'])
   async updatePolicy(
     @requestBody({
       description: 'UpdatePolicy update a old policy to new policy.',

@@ -1,4 +1,5 @@
 import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {
   repository
 } from '@loopback/repository';
@@ -12,6 +13,7 @@ import {
 
   requestBody
 } from '@loopback/rest';
+import {ACL_MEDIA} from '../acls/media.acl';
 import {PostDocumentThrough} from '../models';
 import {PostDocumentThroughRepository} from '../repositories';
 
@@ -29,6 +31,8 @@ export class PostDocumentThroughController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_MEDIA['create'])
   async create(
     @requestBody({
       content: {
@@ -61,7 +65,7 @@ export class PostDocumentThroughController {
     }
   })
   @authenticate("jwt")
-  // @authorize(ACL_USER['create-many'])
+  @authorize(ACL_MEDIA['create'])
   async createMany(
     @requestBody({
       content: {
@@ -199,6 +203,8 @@ export class PostDocumentThroughController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_MEDIA['delete-by-id'])
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.postDocumentThroughRepository.deleteById(id);
   }

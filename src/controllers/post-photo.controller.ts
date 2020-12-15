@@ -1,11 +1,13 @@
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {
   Count,
   CountSchema,
   Filter,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
-  import {
+import {
   del,
   get,
   getModelSchemaRef,
@@ -13,12 +15,11 @@ import {
   param,
   patch,
   post,
-  requestBody,
+  requestBody
 } from '@loopback/rest';
+import {ACL_PHOTO} from '../acls/photo.acl';
 import {
-Post,
-PostPhotoThrough,
-Photo,
+  Photo, Post
 } from '../models';
 import {PostRepository} from '../repositories';
 
@@ -54,6 +55,8 @@ export class PostPhotoController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_PHOTO['create'])
   async create(
     @param.path.number('id') id: typeof Post.prototype.id,
     @requestBody({
@@ -70,6 +73,7 @@ export class PostPhotoController {
     return this.postRepository.photosThrough(id).create(photo);
   }
 
+
   @patch('/posts/{id}/photos', {
     responses: {
       '200': {
@@ -78,6 +82,8 @@ export class PostPhotoController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_PHOTO['update-by-id'])
   async patch(
     @param.path.number('id') id: number,
     @requestBody({
@@ -93,6 +99,8 @@ export class PostPhotoController {
     return this.postRepository.photosThrough(id).patch(photo, where);
   }
 
+
+
   @del('/posts/{id}/photos', {
     responses: {
       '200': {
@@ -101,6 +109,8 @@ export class PostPhotoController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_PHOTO['delete-by-id'])
   async delete(
     @param.path.number('id') id: number,
     @param.query.object('where', getWhereSchemaFor(Photo)) where?: Where<Photo>,

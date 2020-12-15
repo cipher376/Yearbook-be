@@ -29,7 +29,7 @@ export async function assignInstanceId(
     metadata.resource ?? authorizationCtx.resource,
     instanceId,
   );
-  console.debug('assign-instance fnx: ', authorizationCtx.invocationContext)
+  // console.debug('assign-instance fnx: ', authorizationCtx.invocationContext)
 
   // resourceId will override the resource name from metadata
   authorizationCtx.invocationContext.bind(RESOURCE_ID).to(resourceId);
@@ -44,7 +44,7 @@ export async function assignInstanceId(
  */
 function getResourceName(resource: string, id?: number): string {
   // instance level name
-  if (id) return `${resource}${id}`;
+  if (id) return `${resource}_${id}`;
   // class level name
-  return `${resource}*`;
+  return `${resource}`;
 }

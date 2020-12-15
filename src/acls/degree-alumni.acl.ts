@@ -7,7 +7,7 @@ export const ACL_DEGREE_ALUMNI = {
   'find-by-id': {
     resource: RESOURCE_NAME,
     scopes: ['find-by-id'],
-    allowedRoles: ['admin', 'owner'],
+    allowedRoles: [],
     voters: [assignInstanceId],
   }
 }

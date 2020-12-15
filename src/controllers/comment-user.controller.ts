@@ -1,3 +1,5 @@
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {
   Filter,
   repository
@@ -8,6 +10,7 @@ import {
 
   param
 } from '@loopback/rest';
+import {ACL_USER} from '../acls';
 import {
   User
 } from '../models';
@@ -30,11 +33,17 @@ export class CommentUserController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_USER['list-all'])
   async find(
     @param.path.number('id') id: number,
     @param.query.object('filter') filter?: Filter<User>,
   ): Promise<User[]> {
-    return this.commentRepository.likedUsers(id).find(filter);
+    const users = await this.commentRepository.likedUsers(id).find(filter);
+    users.map(user => {
+      delete user.password;
+    })
+    return users;
   }
 
   // @post('/comments/{id}/users', {

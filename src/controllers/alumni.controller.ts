@@ -1,10 +1,17 @@
 import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {
   Count,
   CountSchema,
 
 
   Filter,
+
+
+
+
+
+  FilterExcludingWhere,
 
 
 
@@ -20,8 +27,9 @@ import {
 
   requestBody
 } from '@loopback/rest';
+import {ACL_ALUMNI} from '../acls/alumni.acl';
 import {Alumni, SchoolDetails} from '../models';
-import {AlumniRepository, SchoolDetailsRepository, SchoolRepository} from '../repositories';
+import {AlumniRepository, SchoolDetailsRepository, SchoolRepository, UserRepository} from '../repositories';
 
 export class AlumniController {
   constructor(
@@ -31,7 +39,9 @@ export class AlumniController {
     public schoolDetailsRepository: SchoolDetailsRepository,
     @repository(SchoolRepository)
     public schoolRepository: SchoolRepository,
-  ) {}
+    @repository(UserRepository)
+    public userRepository: UserRepository,
+  ) { }
 
   @post('/alumni', {
     responses: {
@@ -41,8 +51,8 @@ export class AlumniController {
       },
     },
   })
-  // @authenticate("jwt")
-  // @authorize(ACL_ALUMNI['create'])
+  @authenticate("jwt")
+  @authorize(ACL_ALUMNI['create'])
   async create(
     @requestBody({
       content: {
@@ -85,7 +95,7 @@ export class AlumniController {
     },
   })
   @authenticate("jwt")
-  // @authorize(ACL_ALUMNI['count'])
+  @authorize(ACL_ALUMNI['count'])
   async count(
     @param.where(Alumni) where?: Where<Alumni>,
   ): Promise<Count> {
@@ -108,11 +118,57 @@ export class AlumniController {
     },
   })
   @authenticate("jwt")
-  // @authorize(ACL_ALUMNI['list-all'])
+  @authorize(ACL_ALUMNI['list-all'])
   async find(
     @param.filter(Alumni) filter?: Filter<Alumni>,
   ): Promise<Alumni[]> {
-    return this.alumniRepository.find(filter);
+    console.log(JSON.stringify(filter));
+    const alumni = await this.alumniRepository.find(filter);
+    // check if include users
+    try {
+      if (JSON.stringify(filter?.include)?.search('user') > -1) {
+        const userFilter = {
+          include: [
+            {relation: 'address'},
+            {
+              relation: 'photos',
+              scope: {
+                where: {or: [{coverImage: true}, {profile: true}, {flat: true}]}
+              }
+            }
+          ]
+        }
+        for (const alu of alumni) {
+          alu.user = await this.userRepository.findById(alu?.userId, userFilter);
+        }
+      }
+    } catch (e) {
+      console.log(e);
+    }
+
+
+    try {
+      if (JSON.stringify(filter?.include)?.search('school') > -1) {
+        const schoolFilter = {
+          include: [
+            {relation: 'address'},
+            {
+              relation: 'photos',
+              scope: {
+                where: {or: [{coverImage: true}, {profile: true}, {flat: true}]}
+              }
+            }
+          ]
+        }
+        for (const alu of alumni) {
+          alu.school = await this.schoolRepository.findById(alu?.schoolId, schoolFilter);
+        }
+      }
+    } catch (e) {
+      console.log(e);
+    }
+
+    return alumni;
   }
 
   // @patch('/alumni', {
@@ -139,26 +195,27 @@ export class AlumniController {
   //   return this.alumniRepository.updateAll(alumni, where);
   // }
 
-  // @get('/alumni/{id}', {
-  //   responses: {
-  //     '200': {
-  //       description: 'Alumni model instance',
-  //       content: {
-  //         'application/json': {
-  //           schema: getModelSchemaRef(Alumni, {includeRelations: true}),
-  //         },
-  //       },
-  //     },
-  //   },
-  // })
-  // @authenticate("jwt")
-  // @authorize(ACL_ALUMNI['find-by-id'])
-  // async findById(
-  //   @param.path.number('id') id: number,
-  //   @param.filter(Alumni, {exclude: 'where'}) filter?: FilterExcludingWhere<Alumni>
-  // ): Promise<Alumni> {
-  //   return this.alumniRepository.findById(id, filter);
-  // }
+
+  @get('/alumni/{id}', {
+    responses: {
+      '200': {
+        description: 'Alumni model instance',
+        content: {
+          'application/json': {
+            schema: getModelSchemaRef(Alumni, {includeRelations: true}),
+          },
+        },
+      },
+    },
+  })
+  @authenticate("jwt")
+  @authorize(ACL_ALUMNI['find-by-id'])
+  async findById(
+    @param.path.number('id') id: number,
+    @param.filter(Alumni, {exclude: 'where'}) filter?: FilterExcludingWhere<Alumni>
+  ): Promise<Alumni> {
+    return this.alumniRepository.findById(id, filter);
+  }
 
   @patch('/alumni/{id}', {
     responses: {
@@ -168,7 +225,7 @@ export class AlumniController {
     },
   })
   @authenticate("jwt")
-  // @authorize(ACL_ALUMNI['update-by-id'])
+  @authorize(ACL_ALUMNI['update-by-id'])
   async updateById(
     @param.path.number('id') id: number,
     @requestBody({
@@ -207,7 +264,7 @@ export class AlumniController {
     },
   })
   @authenticate("jwt")
-  // @authorize(ACL_ALUMNI['delete-by-id'])
+  @authorize(ACL_ALUMNI['delete-by-id'])
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.alumniRepository.deleteById(id);
   }
@@ -219,9 +276,9 @@ export class AlumniController {
       },
     },
   })
-  // @authenticate("jwt")
-  // @authorize(ACL_ALUMNI['delete-by-id'])
-  async delete(
+  @authenticate("jwt")
+  @authorize(ACL_ALUMNI['delete-by-user-school-id'])
+  async deleteByUserSchoolId(
     @param.path.number('userId') userId: number,
     @param.path.number('schoolId') schoolId: number
   ): Promise<void> {

@@ -1,26 +1,26 @@
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {
-  Count,
   CountSchema,
   Filter,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
-  import {
+import {
   del,
   get,
   getModelSchemaRef,
   getWhereSchemaFor,
   param,
-  patch,
+
   post,
-  requestBody,
+  requestBody
 } from '@loopback/rest';
 import {
-User,
-LikeThrough,
-Comment,
+  Comment, User
 } from '../models';
 import {UserRepository} from '../repositories';
+import {ACL_COMMENT} from './../acls/comment.acl';
 
 export class UserCommentController {
   constructor(
@@ -54,6 +54,8 @@ export class UserCommentController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_COMMENT['create'])
   async create(
     @param.path.number('id') id: typeof User.prototype.id,
     @requestBody({
@@ -70,28 +72,28 @@ export class UserCommentController {
     return this.userRepository.likedComments(id).create(comment);
   }
 
-  @patch('/users/{id}/comments', {
-    responses: {
-      '200': {
-        description: 'User.Comment PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  async patch(
-    @param.path.number('id') id: number,
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Comment, {partial: true}),
-        },
-      },
-    })
-    comment: Partial<Comment>,
-    @param.query.object('where', getWhereSchemaFor(Comment)) where?: Where<Comment>,
-  ): Promise<Count> {
-    return this.userRepository.likedComments(id).patch(comment, where);
-  }
+  // @patch('/users/{id}/comments', {
+  //   responses: {
+  //     '200': {
+  //       description: 'User.Comment PATCH success count',
+  //       content: {'application/json': {schema: CountSchema}},
+  //     },
+  //   },
+  // })
+  // async patch(
+  //   @param.path.number('id') id: number,
+  //   @requestBody({
+  //     content: {
+  //       'application/json': {
+  //         schema: getModelSchemaRef(Comment, {partial: true}),
+  //       },
+  //     },
+  //   })
+  //   comment: Partial<Comment>,
+  //   @param.query.object('where', getWhereSchemaFor(Comment)) where?: Where<Comment>,
+  // ): Promise<Count> {
+  //   return this.userRepository.likedComments(id).patch(comment, where);
+  // }
 
   @del('/users/{id}/comments', {
     responses: {
@@ -101,10 +103,12 @@ export class UserCommentController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_COMMENT['delete-by-id'])
   async delete(
     @param.path.number('id') id: number,
     @param.query.object('where', getWhereSchemaFor(Comment)) where?: Where<Comment>,
-  ): Promise<Count> {
-    return this.userRepository.likedComments(id).delete(where);
+  ): Promise<number> {
+    return (await this.userRepository.likedComments(id).delete(where)).count;
   }
 }

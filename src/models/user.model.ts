@@ -1,4 +1,4 @@
-import {Entity, hasMany, hasOne, model, property} from '@loopback/repository';
+import {belongsTo, Entity, hasMany, hasOne, model, property} from '@loopback/repository';
 import {Address} from './address.model';
 import {Alumni} from './alumni.model';
 import {Audio} from './audio.model';
@@ -98,6 +98,7 @@ export class User extends Entity {
   })
   dateOfBirth?: string;
 
+
   @property({
     type: 'string',
     jsonSchema: {
@@ -189,6 +190,10 @@ export class User extends Entity {
 
   @hasMany(() => School, {through: {model: () => FollowThrough, keyFrom: 'followerId', keyTo: 'leaderId'}})
   followedSchools: School[];
+
+  @belongsTo(() => Alumni)
+  alumniId: number;
+  //Relation property
 
   constructor(data?: Partial<User>) {
     super(data);

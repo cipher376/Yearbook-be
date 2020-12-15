@@ -72,7 +72,7 @@ export class CasbinDbEnforcer {
     })
   }
 
-  async enforcer() {
+  async enforcerFactory() {
     const conf = path.resolve(
       __dirname,
       './../../../fixtures/casbin/rbac_model.conf',

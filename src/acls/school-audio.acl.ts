@@ -6,19 +6,19 @@ export const ACL_SCHOOL_AUDIO = {
   create: {
     resource: RESOURCE_NAME,
     scopes: ['create'],
-    allowedRoles: ['authUser'],
+    allowedRoles: ['admin, schoolAdmin'],
     voters: [assignInstanceId],
   },
   'list-all': {
     resource: RESOURCE_NAME,
     scopes: ['list-all'],
-    allowedRoles: ['anonymous'],
+    allowedRoles: [],
     voters: [assignInstanceId],
   },
   'update-by-id': {
     resource: RESOURCE_NAME,
     scopes: ['update-by-id'],
-    allowedRoles: ['admin',],
+    allowedRoles: ['admin', 'schoolAdmin'],
     voters: [assignInstanceId],
   },
 

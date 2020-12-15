@@ -11,12 +11,12 @@ export const ACL_ALUMNI = {
   count: {
     resource: RESOURCE_NAME,
     scopes: ['count'],
-    allowedRoles: ['authUser'],
+    allowedRoles: [],
   },
   'list-all': {
     resource: RESOURCE_NAME,
     scopes: ['list-all'],
-    allowedRoles: ['admin'],
+    allowedRoles: [],
   },
   'update-all': {
     resource: RESOURCE_NAME,
@@ -26,13 +26,13 @@ export const ACL_ALUMNI = {
   'find-by-id': {
     resource: RESOURCE_NAME,
     scopes: ['find-by-id'],
-    allowedRoles: ['admin'],
+    allowedRoles: [],
     voters: [assignInstanceId],
   },
   'update-by-id': {
     resource: RESOURCE_NAME,
     scopes: ['update-by-id'],
-    allowedRoles: ['admin', 'owner'],
+    allowedRoles: ['admin', 'authUser'], // owner
     voters: [assignInstanceId],
   },
   'replace-by-id': {
@@ -44,7 +44,13 @@ export const ACL_ALUMNI = {
   'delete-by-id': {
     resource: RESOURCE_NAME,
     scopes: ['delete-by-id'],
-    allowedRoles: ['admin', 'owner'],
+    allowedRoles: ['admin', 'authUser'], // owner
+    voters: [assignInstanceId],
+  },
+  'delete-by-user-school-id': {
+    resource: RESOURCE_NAME,
+    scopes: ['delete-by-user-school-id'],
+    allowedRoles: ['admin'],
     voters: [assignInstanceId],
   }
 };

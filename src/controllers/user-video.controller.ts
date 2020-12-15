@@ -1,9 +1,11 @@
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {
   Count,
   CountSchema,
   Filter,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
 import {
   del,
@@ -11,15 +13,16 @@ import {
   getModelSchemaRef,
   getWhereSchemaFor,
   param,
-  patch,
+
   post,
-  requestBody,
+  requestBody
 } from '@loopback/rest';
 import {
   User,
-  Video,
+  Video
 } from '../models';
 import {UserRepository} from '../repositories';
+import {ACL_MEDIA} from './../acls/media.acl';
 
 export class UserVideoController {
   constructor(
@@ -53,6 +56,8 @@ export class UserVideoController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_MEDIA['create'])
   async create(
     @param.path.number('id') id: typeof User.prototype.id,
     @requestBody({
@@ -70,28 +75,28 @@ export class UserVideoController {
     return this.userRepository.videos(id).create(video);
   }
 
-  @patch('/users/{id}/videos', {
-    responses: {
-      '200': {
-        description: 'User.Video PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  async patch(
-    @param.path.number('id') id: number,
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Video, {partial: true}),
-        },
-      },
-    })
-    video: Partial<Video>,
-    @param.query.object('where', getWhereSchemaFor(Video)) where?: Where<Video>,
-  ): Promise<Count> {
-    return this.userRepository.videos(id).patch(video, where);
-  }
+  // @patch('/users/{id}/videos', {
+  //   responses: {
+  //     '200': {
+  //       description: 'User.Video PATCH success count',
+  //       content: {'application/json': {schema: CountSchema}},
+  //     },
+  //   },
+  // })
+  // async patch(
+  //   @param.path.number('id') id: number,
+  //   @requestBody({
+  //     content: {
+  //       'application/json': {
+  //         schema: getModelSchemaRef(Video, {partial: true}),
+  //       },
+  //     },
+  //   })
+  //   video: Partial<Video>,
+  //   @param.query.object('where', getWhereSchemaFor(Video)) where?: Where<Video>,
+  // ): Promise<Count> {
+  //   return this.userRepository.videos(id).patch(video, where);
+  // }
 
   @del('/users/{id}/videos', {
     responses: {
@@ -101,6 +106,8 @@ export class UserVideoController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_MEDIA['delete-by-id'])
   async delete(
     @param.path.number('id') id: number,
     @param.query.object('where', getWhereSchemaFor(Video)) where?: Where<Video>,

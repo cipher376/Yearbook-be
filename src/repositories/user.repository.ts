@@ -1,5 +1,5 @@
 import {Getter, inject} from '@loopback/core';
-import {DefaultCrudRepository, HasManyRepositoryFactory, HasManyThroughRepositoryFactory, HasOneRepositoryFactory, repository} from '@loopback/repository';
+import {DefaultCrudRepository, HasManyRepositoryFactory, HasManyThroughRepositoryFactory, HasOneRepositoryFactory, repository, BelongsToAccessor} from '@loopback/repository';
 import {DbDataSource} from '../datasources';
 import {Address, Alumni, Audio, Comment, Document, FollowThrough, LikeThrough, Photo, Post, School, User, UserConfig, UserRelations, Video} from '../models';
 import {AddressRepository} from './address.repository';
@@ -53,6 +53,8 @@ export class UserRepository extends DefaultCrudRepository<
     typeof User.prototype.id
   >;
 
+  public readonly alumni: BelongsToAccessor<Alumni, typeof User.prototype.id>;
+
   constructor(
     @inject('datasources.db') dataSource: DbDataSource,
     @repository.getter('PostRepository') protected postRepositoryGetter: Getter<PostRepository>,
@@ -61,6 +63,8 @@ export class UserRepository extends DefaultCrudRepository<
     @repository.getter('SchoolRepository') protected schoolRepositoryGetter: Getter<SchoolRepository>, @repository.getter('VideoRepository') protected videoRepositoryGetter: Getter<VideoRepository>, @repository.getter('AudioRepository') protected audioRepositoryGetter: Getter<AudioRepository>, @repository.getter('DocumentRepository') protected documentRepositoryGetter: Getter<DocumentRepository>, @repository.getter('CommentRepository') protected commentRepositoryGetter: Getter<CommentRepository>, @repository.getter('LikeThroughRepository') protected likeThroughRepositoryGetter: Getter<LikeThroughRepository>, @repository.getter('FollowThroughRepository') protected followThroughRepositoryGetter: Getter<FollowThroughRepository>,
   ) {
     super(User, dataSource);
+    this.alumni = this.createBelongsToAccessorFor('alumni', alumniRepositoryGetter,);
+    this.registerInclusionResolver('alumni', this.alumni.inclusionResolver);
     this.followedSchools = this.createHasManyThroughRepositoryFactoryFor('followedSchools', schoolRepositoryGetter, followThroughRepositoryGetter,);
     // this.registerInclusionResolver('followedSchools', this.followedSchools.inclusionResolver);
     this.likedComments = this.createHasManyThroughRepositoryFactoryFor('likedComments', commentRepositoryGetter, likeThroughRepositoryGetter,);

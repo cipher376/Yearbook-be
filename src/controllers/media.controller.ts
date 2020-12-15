@@ -83,8 +83,8 @@ export class MediaController {
       },
     },
   })
-  @authenticate("jwt")
-  @authorize(ACL_MEDIA['count'])
+  // @authenticate("jwt")
+  // @authorize(ACL_MEDIA['count'])
   async count(
     @param.where(Media) where?: Where<Media>,
   ): Promise<Count> {
@@ -148,8 +148,8 @@ export class MediaController {
       },
     },
   })
-  @authenticate("jwt")
-  @authorize(ACL_MEDIA['find-by-id'])
+  // @authenticate("jwt")
+  // @authorize(ACL_MEDIA['find-by-id'])
   async findById(
     @param.path.number('id') id: number,
     @param.filter(Media, {exclude: 'where'}) filter?: FilterExcludingWhere<Media>
@@ -228,7 +228,7 @@ export class MediaController {
     },
   })
   @authenticate("jwt")
-  // @authorize(ACL_MEDIA['upload'])
+  @authorize(ACL_MEDIA['upload'])
   async fileUpload(
     @param.path.boolean('createThumb') createThumb: boolean,
     @requestBody.file()

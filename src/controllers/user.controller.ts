@@ -1,7 +1,7 @@
 import {authenticate, AuthenticationBindings} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {inject} from '@loopback/core';
 import {
-  Count,
   CountSchema,
   Filter,
   FilterExcludingWhere, repository,
@@ -14,7 +14,9 @@ import {
   requestBody
 } from '@loopback/rest';
 import {UserProfile} from '@loopback/security';
+import * as casbin from 'casbin';
 import _ from 'lodash';
+import {ACL_USER} from '../acls';
 import {PasswordHasherBindings, TokenServiceBindings, UserServiceBindings} from '../keys';
 import {User} from '../models';
 import {UserRepository} from '../repositories';
@@ -22,17 +24,13 @@ import {validateCredentials} from '../services';
 import {BcryptHasher} from '../services/hash.password';
 import {Credentials, MyJWTService, MyUserService} from '../services/jwt-authentication';
 import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
+import {CasbinDbEnforcer} from './../services/casbin-authorization/casbin.enforcers';
 
-// export interface UserInfo {
-//   firstName: string;
-//   lastName: string;
-//   otherName: string
-//   nickname: string
-//   dob: string
-// }
-
+const applyFilter = require('loopback-filters');
 
 export class UserController {
+  enforcer: Promise<casbin.Enforcer>;
+
   constructor(
     @repository(UserRepository)
     public userRepository: UserRepository,
@@ -49,9 +47,14 @@ export class UserController {
     @inject(TokenServiceBindings.TOKEN_SERVICE)
     public jwtService: MyJWTService,
 
-    // @repository(PhotoRepository)
-    // public photoRepository: PhotoRepository
-  ) { }
+    @inject('casbin.enforcer.factory')
+    private enforcerService: CasbinDbEnforcer,
+  ) {
+    this.enforcer = enforcerService.enforcerFactory();
+    console.log("My enforcerService")
+  }
+
+
 
   @post('/signup', {
     responses: {
@@ -63,7 +66,6 @@ export class UserController {
       }
     }
   })
-  // @authorize(ACL_PROJECT['signup'])
   async signup(@requestBody() userData: User) {
     validateCredentials(_.pick(userData, ['email', 'phone', 'password']));
     // check if user exist
@@ -76,9 +78,19 @@ export class UserController {
     }
     userData.password = await this.hasher.hashPassword(userData.password as string)
     const savedUser = await this.userRepository.create(userData);
+
+    // update user policies
+    (await this.enforcer).addGroupingPolicy(...[`u${savedUser?.id}`, 'authUser']).then(_ => {
+    }).catch(error => {
+      console.debug(error);
+    })
+
     delete savedUser.password;
     return savedUser;
   }
+
+
+
 
   @post('/login', {
     responses: {
@@ -99,7 +111,6 @@ export class UserController {
       }
     }
   })
-  // @authorize(ACL_PROJECT['login'])
   async login(
     @requestBody() credentials: Credentials,
   ): Promise<{token: string}> {
@@ -107,6 +118,8 @@ export class UserController {
 
     // make sure user exist,password should be valid
     const user = await this.userService.verifyCredentials(credentials);
+
+    delete user.password;
     // console.log(user);
     const userProfile = this.userService.convertToUserProfile(user);
     // console.log(userProfile);
@@ -117,30 +130,28 @@ export class UserController {
 
 
 
-  // @authenticate("jwt")
-  // @get('/logout', {
-  //   security: OPERATION_SECURITY_SPEC,
-  //   responses: {
-  //     '200': {
-  //       description: 'The current user profile',
-  //       content: {
-  //         'application/json': {
-  //           schema: getJsonSchemaRef(User),
-  //         },
-  //       },
-  //     },
-  //   },
-  // })
-  // async logout(
-  //   @inject(AuthenticationBindings.CURRENT_USER)
-  //   currentUser: UserProfile,
-  // ): Promise<UserProfile> {
-  //   this.jwtService.expiresSecret
-  //   return Promise.resolve(currentUser);
-  // }
-
-
-
+  @get('/logout', {
+    security: OPERATION_SECURITY_SPEC,
+    responses: {
+      '200': {
+        description: 'The current user profile',
+        content: {
+          'application/json': {
+            schema: getJsonSchemaRef(User),
+          },
+        },
+      },
+    },
+  })
+  @authenticate("jwt")
+  async logout(
+    @inject(AuthenticationBindings.CURRENT_USER)
+    currentUser: UserProfile,
+  ): Promise<UserProfile> {
+    this.jwtService.expiresSecret;
+    delete currentUser?.password
+    return Promise.resolve(currentUser);
+  }
 
 
   @get('/users/me', {
@@ -157,11 +168,12 @@ export class UserController {
     },
   })
   @authenticate("jwt")
-  // @authorize(ACL_USER['me'])
+  @authorize(ACL_USER['me'])
   async me(
     @inject(AuthenticationBindings.CURRENT_USER)
     currentUser: UserProfile,
   ): Promise<UserProfile> {
+    delete currentUser?.password
     return Promise.resolve(currentUser);
   }
 
@@ -179,7 +191,7 @@ export class UserController {
     },
   })
   @authenticate("jwt")
-  // @authorize(ACL_USER['my-profile'])
+  @authorize(ACL_USER['my-profile'])
   async myProfile(
     @inject(AuthenticationBindings.CURRENT_USER)
     currentUser: UserProfile,
@@ -204,12 +216,9 @@ export class UserController {
     }, error => {
       console.debug(error);
     })
-
+    delete user.password;
     return Promise.resolve(user);
   }
-
-
-  // @authenticate("jwt")
 
 
   // @patch('/users', {
@@ -247,12 +256,13 @@ export class UserController {
     },
   })
   @authenticate("jwt")
-  // @authorize(ACL_USER['my-profile'])
+  @authorize(ACL_USER['find-by-id'])
   async findById(
     @param.path.number('id') id: number,
     @param.filter(User, {exclude: 'where'}) filter?: FilterExcludingWhere<User>
   ): Promise<User> {
     const user: User = await this.userRepository.findById(id, filter);
+    delete user.password;
     return Promise.resolve(this.userService.convertToUserView(user));
   }
 
@@ -264,7 +274,7 @@ export class UserController {
     },
   })
   @authenticate("jwt")
-  // @authorize(ACL_USER['update-by-id'])
+  @authorize(ACL_USER['update-by-id'])
   async updateById(
     @param.path.number('id') id: number,
     @requestBody({
@@ -276,8 +286,11 @@ export class UserController {
     })
     user: User,
   ): Promise<User> {
+
     // clear the sensitive fields
-    return this.userService.updateUser(id, user)
+    const returnUser = await this.userService.updateUser(id, user);
+    delete returnUser.password;
+    return returnUser;
   }
 
   // @put('/users/{id}', {
@@ -306,6 +319,148 @@ export class UserController {
   // }
 
 
+
+
+  // searching the database and return users that
+  // match the searched word. if type-ahead TP is set, it will return
+  // only 5 of the search results else 20 or any number you have already set
+
+  @get('/users-search/{searchKey}', {
+    responses: {
+      '200': {
+        description: 'Array of User model instances',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'array',
+              items: getModelSchemaRef(User, {includeRelations: true}),
+            },
+          },
+        },
+      },
+    },
+  })
+  @authenticate("jwt")
+  @authorize(ACL_USER['list-all'])
+  async searchExtensive(
+    @param.path.string('searchKey') searchKey: string,
+    @param.filter(User) filter?: Filter<User>,
+  ): Promise<User[]> {
+
+    let users: User[] = await this.userRepository.find({
+      include: [{
+        relation: 'address',
+      },
+      {
+        relation: 'photos',
+        scope: {
+          where: {
+            or: [{profile: true}, {flag: true}, {coverImage: true}]
+          }
+        }
+      },
+      ]
+    });
+
+    if (searchKey === 'all') {
+      return applyFilter(users, filter);
+    }
+
+    const keys: string[] = [];
+    let tempKeys: string[] = [];
+    let foundUsers: {user: User, score: number}[] = [];
+
+
+    // build keys or search terms
+    tempKeys = searchKey.split(' ');
+    tempKeys.push(searchKey);
+
+    // remove duplicates
+    keys.push(searchKey);
+    tempKeys.forEach(key => {
+      key = key.toLowerCase().trim();
+      if (!keys.includes(key)) {
+        keys.push(key);
+      }
+    })
+    console.log(filter);
+
+    users.forEach(user => {
+      const foundUser: {user: User, score: number} = {user: user, score: 0};
+      for (const key of keys) {
+        if (user?.firstName?.toLowerCase()?.trim()?.search(key) > -1) {
+          foundUser.score += 6;
+        }
+        if (user?.lastName?.toLowerCase()?.trim()?.search(key) > -1) {
+          foundUser.score += 6;
+        }
+        if ((user?.otherName) ?? ''.toLowerCase()?.trim()?.search(key) > -1) {
+          foundUser.score += 6;
+        }
+        if ((user?.nickName) ?? ''.toLowerCase()?.trim()?.search(key) > -1) {
+          foundUser.score += 4.0;
+        }
+        if (user?.phone?.toLowerCase()?.trim()?.search(key) > -1) {
+          foundUser.score += 5.9;
+        }
+        if (user?.email?.toLowerCase()?.trim()?.search(key) > -1) {
+          foundUser.score += 6;
+        }
+        if ((user?.address?.latLng ?? '')?.toLowerCase().trim().search(key) > -1) {
+          foundUser.score += 5.8;
+        }
+        if (user?.address?.street?.toLowerCase().trim().search(key) > -1) {
+          foundUser.score += 4.3;
+        }
+        if (user?.address?.suburb?.toLowerCase().trim().search(key) > -1) {
+          foundUser.score += 4.3;
+        }
+        if (user?.address?.city?.toLowerCase().trim().search(key) > -1) {
+          foundUser.score += 4.3;
+        }
+        if (user?.address?.state?.toLowerCase().trim().search(key) > -1) {
+          foundUser.score += 3.9;
+        }
+        if (user?.address?.country?.toLowerCase().trim().search(key) > -1) {
+          foundUser.score += 3.9;
+        }
+        if (user?.address?.postcode?.toLowerCase().trim().search(key) > -1) {
+          foundUser.score += 3.9;
+        }
+
+        if ((user?.gender) ?? ''.toLowerCase().trim().search(key) > -1) {
+          foundUser.score += 3.1;
+        }
+      }
+
+      // check if user had a score
+      if (foundUser.score > 0) {
+        foundUsers.push(foundUser);
+      }
+
+      foundUsers = foundUsers.sort((us1, us2) => {
+        if (us1.score < us2.score) {
+          return 1;
+        } else if (us1.score > us2.score) {
+          return -1;
+        } else {
+          return 0; // equall
+        }
+      });
+    })
+    // applying filter to allow paging from front end
+    users = [];
+    foundUsers = applyFilter(foundUsers, filter);
+    foundUsers.forEach(fs => {
+      delete fs.user?.password;
+      users.push(fs.user);
+    })
+    return users;
+
+  }
+
+
+
   ////////////////////ADMIN ENDPOINTS//////////////////////////
 
   @get('/users/count', {
@@ -317,14 +472,13 @@ export class UserController {
     },
   })
   @authenticate("jwt")
-  // @authorize(ACL_USER['count'])
+  @authorize(ACL_USER['count'])
   async count(
     @param.where(User) where?: Where<User>,
-  ): Promise<Count> {
-    return this.userRepository.count(where);
+  ): Promise<number> {
+    return (await this.userRepository.count(where)).count
   }
 
-  // @authenticate("jwt")
   @get('/users', {
     responses: {
       '200': {
@@ -341,7 +495,7 @@ export class UserController {
     },
   })
   @authenticate("jwt")
-  // @authorize(ACL_USER['list-all'])
+  @authorize(ACL_USER['list-all'])
   async find(
     @param.filter(User) filter?: Filter<User>,
   ): Promise<User[]> {
@@ -356,7 +510,12 @@ export class UserController {
       }
     }
     // console.log(filter);
-    return this.userService.getUsers(filter);
+    const users = await this.userService.getUsers(filter);
+    users.map(user => {
+      delete user?.password;
+    })
+
+    return users;
   }
 
 
@@ -373,7 +532,7 @@ export class UserController {
     }
   })
   @authenticate("jwt")
-  // @authorize(ACL_USER['create-many'])
+  @authorize(ACL_USER['create-many'])
   async createMany(
     @requestBody({
       content: {
@@ -410,5 +569,9 @@ export class UserController {
     }
     return {res, errors};
   }
+
+
+
+
 
 }

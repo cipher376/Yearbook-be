@@ -1,29 +1,33 @@
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {
   Count,
   CountSchema,
   Filter,
-  FilterExcludingWhere,
+
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
 import {
-  post,
-  param,
-  get,
-  getModelSchemaRef,
-  patch,
-  put,
-  del,
-  requestBody,
+  del, get,
+  getModelSchemaRef, param, post,
+
+
+
+
+
+
+  requestBody
 } from '@loopback/rest';
 import {Comment} from '../models';
 import {CommentRepository} from '../repositories';
+import {ACL_COMMENT} from './../acls/comment.acl';
 
 export class CommentController {
   constructor(
     @repository(CommentRepository)
-    public commentRepository : CommentRepository,
-  ) {}
+    public commentRepository: CommentRepository,
+  ) { }
 
   @post('/comments', {
     responses: {
@@ -33,6 +37,8 @@ export class CommentController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_COMMENT['create'])
   async create(
     @requestBody({
       content: {
@@ -84,81 +90,81 @@ export class CommentController {
     return this.commentRepository.find(filter);
   }
 
-  @patch('/comments', {
-    responses: {
-      '200': {
-        description: 'Comment PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  async updateAll(
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Comment, {partial: true}),
-        },
-      },
-    })
-    comment: Comment,
-    @param.where(Comment) where?: Where<Comment>,
-  ): Promise<Count> {
-    return this.commentRepository.updateAll(comment, where);
-  }
+  // @patch('/comments', {
+  //   responses: {
+  //     '200': {
+  //       description: 'Comment PATCH success count',
+  //       content: {'application/json': {schema: CountSchema}},
+  //     },
+  //   },
+  // })
+  // async updateAll(
+  //   @requestBody({
+  //     content: {
+  //       'application/json': {
+  //         schema: getModelSchemaRef(Comment, {partial: true}),
+  //       },
+  //     },
+  //   })
+  //   comment: Comment,
+  //   @param.where(Comment) where?: Where<Comment>,
+  // ): Promise<Count> {
+  //   return this.commentRepository.updateAll(comment, where);
+  // }
 
-  @get('/comments/{id}', {
-    responses: {
-      '200': {
-        description: 'Comment model instance',
-        content: {
-          'application/json': {
-            schema: getModelSchemaRef(Comment, {includeRelations: true}),
-          },
-        },
-      },
-    },
-  })
-  async findById(
-    @param.path.number('id') id: number,
-    @param.filter(Comment, {exclude: 'where'}) filter?: FilterExcludingWhere<Comment>
-  ): Promise<Comment> {
-    return this.commentRepository.findById(id, filter);
-  }
+  // @get('/comments/{id}', {
+  //   responses: {
+  //     '200': {
+  //       description: 'Comment model instance',
+  //       content: {
+  //         'application/json': {
+  //           schema: getModelSchemaRef(Comment, {includeRelations: true}),
+  //         },
+  //       },
+  //     },
+  //   },
+  // })
+  // async findById(
+  //   @param.path.number('id') id: number,
+  //   @param.filter(Comment, {exclude: 'where'}) filter?: FilterExcludingWhere<Comment>
+  // ): Promise<Comment> {
+  //   return this.commentRepository.findById(id, filter);
+  // }
 
-  @patch('/comments/{id}', {
-    responses: {
-      '204': {
-        description: 'Comment PATCH success',
-      },
-    },
-  })
-  async updateById(
-    @param.path.number('id') id: number,
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Comment, {partial: true}),
-        },
-      },
-    })
-    comment: Comment,
-  ): Promise<void> {
-    await this.commentRepository.updateById(id, comment);
-  }
+  // @patch('/comments/{id}', {
+  //   responses: {
+  //     '204': {
+  //       description: 'Comment PATCH success',
+  //     },
+  //   },
+  // })
+  // async updateById(
+  //   @param.path.number('id') id: number,
+  //   @requestBody({
+  //     content: {
+  //       'application/json': {
+  //         schema: getModelSchemaRef(Comment, {partial: true}),
+  //       },
+  //     },
+  //   })
+  //   comment: Comment,
+  // ): Promise<void> {
+  //   await this.commentRepository.updateById(id, comment);
+  // }
 
-  @put('/comments/{id}', {
-    responses: {
-      '204': {
-        description: 'Comment PUT success',
-      },
-    },
-  })
-  async replaceById(
-    @param.path.number('id') id: number,
-    @requestBody() comment: Comment,
-  ): Promise<void> {
-    await this.commentRepository.replaceById(id, comment);
-  }
+  // @put('/comments/{id}', {
+  //   responses: {
+  //     '204': {
+  //       description: 'Comment PUT success',
+  //     },
+  //   },
+  // })
+  // async replaceById(
+  //   @param.path.number('id') id: number,
+  //   @requestBody() comment: Comment,
+  // ): Promise<void> {
+  //   await this.commentRepository.replaceById(id, comment);
+  // }
 
   @del('/comments/{id}', {
     responses: {
@@ -167,6 +173,8 @@ export class CommentController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_COMMENT['delete-by-id'])
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.commentRepository.deleteById(id);
   }

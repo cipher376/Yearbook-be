@@ -12,21 +12,21 @@ export const ACL_USER_PHOTO = {
   'list-all': {
     resource: RESOURCE_NAME,
     scopes: ['list-all'],
-    allowedRoles: ['admin', 'owner'],
+    allowedRoles: [],
     voters: [assignInstanceId],
 
   },
   'update-by-id': {
     resource: RESOURCE_NAME,
     scopes: ['update-by-id'],
-    allowedRoles: ['admin', 'owner'],
+    allowedRoles: ['admin', 'authUser'], // owner
     voters: [assignInstanceId],
   },
 
   'delete-by-id': {
     resource: RESOURCE_NAME,
     scopes: ['delete-by-id'],
-    allowedRoles: ['admin', 'owner'],
+    allowedRoles: ['admin'],
     voters: [assignInstanceId],
   }
 }

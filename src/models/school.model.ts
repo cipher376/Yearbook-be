@@ -73,6 +73,11 @@ export class School extends Entity {
   @hasMany(() => User, {through: {model: () => FollowThrough, keyFrom: 'leaderId', keyTo: 'followerId'}})
   followers: User[];
 
+  @property({
+    type: 'number',
+  })
+  alumniId?: number;
+
   constructor(data?: Partial<School>) {
     super(data);
   }

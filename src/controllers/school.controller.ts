@@ -1,3 +1,5 @@
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {
   Count,
   CountSchema,
@@ -13,6 +15,7 @@ import {
   put,
   requestBody
 } from '@loopback/rest';
+import {ACL_SCHOOL} from '../acls';
 import {School} from '../models';
 import {SchoolRepository} from '../repositories';
 import {User} from './../models/user.model';
@@ -22,7 +25,7 @@ export class SchoolController {
   constructor(
     @repository(SchoolRepository)
     public schoolRepository: SchoolRepository,
-  ) {}
+  ) { }
 
   @post('/schools-create-many', {
     responses: {
@@ -32,8 +35,8 @@ export class SchoolController {
       },
     },
   })
-  // @authenticate("jwt")
-  // @authorize(ACL_SCHOOL['create'])
+  @authenticate("jwt")
+  @authorize(ACL_SCHOOL['create'])
   async createMany(
     @requestBody({
       content: {
@@ -58,8 +61,8 @@ export class SchoolController {
       },
     },
   })
-  // @authenticate("jwt")
-  // @authorize(ACL_SCHOOL['create'])
+  @authenticate("jwt")
+  @authorize(ACL_SCHOOL['create'])
   async create(
     @requestBody({
       content: {
@@ -83,8 +86,8 @@ export class SchoolController {
       },
     },
   })
-  // @authenticate("jwt")
-  // @authorize(ACL_SCHOOL['count'])
+  @authenticate("jwt")
+  @authorize(ACL_SCHOOL['count'])
   async count(
     @param.where(School) where?: Where<School>,
   ): Promise<Count> {
@@ -106,8 +109,6 @@ export class SchoolController {
       },
     },
   })
-  // @authenticate("jwt")
-  // @authorize(ACL_SCHOOL['list-all'])
   async find(
     @param.filter(School) filter?: Filter<School>,
   ): Promise<School[]> {
@@ -143,6 +144,14 @@ export class SchoolController {
     let schools: School[] = await this.schoolRepository.find({
       include: [{
         relation: 'address',
+      },
+      {
+        relation: 'photos',
+        scope: {
+          where: {
+            or: [{profile: true}, {flag: true}, {coverImage: true}]
+          }
+        }
       },
       {
         relation: 'schoolDetails'
@@ -338,8 +347,8 @@ export class SchoolController {
       },
     },
   })
-  // @authenticate("jwt")
-  // @authorize(ACL_SCHOOL['list-all'])
+  @authenticate("jwt")
+  @authorize(ACL_SCHOOL['list-all'])
   async searchQuick(
     @param.path.string('searchKey') searchKey: string,
     @param.path.boolean('typeAhead') typeAhead?: boolean,
@@ -354,7 +363,7 @@ export class SchoolController {
 
 
     schools = schools.filter(school => {
-      if (school.name.indexOf(name) > -1) {
+      if (school.name.indexOf('name') > -1) {
         return true;
       }
       return false;
@@ -374,8 +383,8 @@ export class SchoolController {
       },
     },
   })
-  // @authenticate("jwt")
-  // @authorize(ACL_SCHOOL['update-all'])
+  @authenticate("jwt")
+  @authorize(ACL_SCHOOL['update-all'])
   async updateAll(
     @requestBody({
       content: {
@@ -402,8 +411,6 @@ export class SchoolController {
       },
     },
   })
-  // @authenticate("jwt")
-  // @authorize(ACL_SCHOOL['find-by-id'])
   async findById(
     @param.path.number('id') id: number,
     @param.filter(School, {exclude: 'where'}) filter?: FilterExcludingWhere<School>
@@ -418,8 +425,8 @@ export class SchoolController {
       },
     },
   })
-  // @authenticate("jwt")
-  // @authorize(ACL_SCHOOL['update-by-id'])
+  @authenticate("jwt")
+  @authorize(ACL_SCHOOL['update-by-id'])
   async updateById(
     @param.path.number('id') id: number,
     @requestBody({
@@ -441,8 +448,8 @@ export class SchoolController {
       },
     },
   })
-  // @authenticate("jwt")
-  // @authorize(ACL_SCHOOL['replace-by-id'])
+  @authenticate("jwt")
+  @authorize(ACL_SCHOOL['replace-by-id'])
   async replaceById(
     @param.path.number('id') id: number,
     @requestBody() school: School,
@@ -457,8 +464,8 @@ export class SchoolController {
       },
     },
   })
-  // @authenticate("jwt")
-  // @authorize(ACL_SCHOOL['delete-by-id'])
+  @authenticate("jwt")
+  @authorize(ACL_SCHOOL['delete-by-id'])
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.schoolRepository.deleteById(id);
   }

@@ -11,22 +11,8 @@ import {
 import {
   del, get,
   getModelSchemaRef, param,
-
-
   patch,
-
-
-
-
-
-
   post,
-
-
-
-
-
-
   requestBody
 } from '@loopback/rest';
 import {ACL_PHOTO} from '../acls/photo.acl';
@@ -37,7 +23,7 @@ export class PhotoController {
   constructor(
     @repository(PhotoRepository)
     public photoRepository: PhotoRepository,
-  ) {}
+  ) { }
 
   @post('/photos-createMany', {
     responses: {
@@ -47,8 +33,8 @@ export class PhotoController {
       },
     },
   })
-  // @authenticate("jwt")
-  // @authorize(ACL_PHOTO['create'])
+  @authenticate("jwt")
+  @authorize(ACL_PHOTO['create-many'])
   async createMany(
     @requestBody({
       content: {
@@ -106,7 +92,7 @@ export class PhotoController {
     },
   })
   @authenticate("jwt")
-  // @authorize(ACL_PHOTO['list-all'])
+  @authorize(ACL_PHOTO['list-all'])
   async find(
     @param.filter(Photo) filter?: Filter<Photo>,
   ): Promise<Photo[]> {

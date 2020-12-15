@@ -12,16 +12,23 @@ import {
 } from '@loopback/authorization';
 import {inject, Provider} from '@loopback/core';
 import * as casbin from 'casbin';
+import {CasbinDbEnforcer} from '.';
 import {RESOURCE_ID} from '../../keys';
+
 const debug = require('debug')('loopback:example:acl');
 const DEFAULT_SCOPE = 'execute';
 
 // Class level authorizer
 export class CasbinAuthorizationProvider implements Provider<Authorizer> {
+  enforcer: Promise<casbin.Enforcer>;
+
   constructor(
     @inject('casbin.enforcer.factory')
-    private enforcerFactory: (name?: string) => Promise<casbin.Enforcer>,
-  ) {}
+    private enforcerFactoryClass: CasbinDbEnforcer,
+  ) {
+    this.enforcer = this.enforcerFactoryClass.enforcerFactory();
+    // console.log(this.enforcer);
+  }
 
   /**
    * @returns authenticateFn
@@ -35,12 +42,12 @@ export class CasbinAuthorizationProvider implements Provider<Authorizer> {
     metadata: AuthorizationMetadata,
   ): Promise<AuthorizationDecision> {
     // handle unauthenticated errors
-    console.log(authorizationCtx?.principals);
+    // console.log(authorizationCtx?.principals);
     if (!(authorizationCtx?.principals?.length > 0)) {
       return AuthorizationDecision.DENY;
     }
     const subject = this.getUserName(authorizationCtx.principals[0].id);
-    console.log('authorize fnx:', subject);
+    console.log('authorize subject:', subject);
 
     const resourceId = await authorizationCtx.invocationContext.get(
       RESOURCE_ID,
@@ -54,26 +61,29 @@ export class CasbinAuthorizationProvider implements Provider<Authorizer> {
       action: metadata.scopes?.[0] ?? DEFAULT_SCOPE,
     };
 
-    console.debug('authorize fnx: ', request);
+    console.debug('authorize request: ', request);
 
     const allowedRoles = metadata.allowedRoles;
-    console.debug('authorize fnx: ', allowedRoles)
+    console.debug('authorize allowed roles: ', allowedRoles)
+
     if (!allowedRoles) return AuthorizationDecision.ALLOW;
-    if (allowedRoles.length < 1) return AuthorizationDecision.DENY;
+    if (allowedRoles.length < 1) return AuthorizationDecision.ALLOW; // No role restrictions
 
     let allow = false;
-
     // An optimization for ONLY searching among the allowed roles' policies
     for (const role of allowedRoles) {
-      const enforcer = await this.enforcerFactory(role);
 
-      const allowedByRole = await enforcer.enforce(
+      const objects: string[] = request.object.split('_');
+      const id = objects.length > 1 ? objects[1] : ''; // handling ownership, getting logged in user id
+
+      console.log('Objects: ' + JSON.stringify(objects))
+      const allowedByRole: boolean = await (await this.enforcer).enforce(
         request.subject,
-        request.object,
-        request.action,
+        objects[0],
+        request.action
       );
 
-      console.debug(`authorizer role: ${role}, result: ${allowedByRole}`);
+      console.debug(`authorizer role: ${role}, result: ${JSON.stringify(allowedByRole)}`);
       if (allowedByRole) {
         allow = true;
         break;

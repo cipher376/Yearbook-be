@@ -1,5 +1,6 @@
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {
-  Count,
   CountSchema,
   Filter,
   FilterExcludingWhere,
@@ -9,19 +10,13 @@ import {
 import {
   del, get,
   getModelSchemaRef, param,
-
-
   patch, post,
-
-
-
-
-  put,
 
   requestBody
 } from '@loopback/rest';
 import {Post} from '../models';
 import {PostAudioThroughRepository, PostRepository, PostVideoThroughRepository} from '../repositories';
+import {ACL_POST} from './../acls/post.acl';
 import {PostPhotoThroughRepository} from './../repositories/post-photo-through.repository';
 
 export class PostController {
@@ -44,6 +39,8 @@ export class PostController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POST['create'])
   async create(
     @requestBody({
       content: {
@@ -70,8 +67,8 @@ export class PostController {
   })
   async count(
     @param.where(Post) where?: Where<Post>,
-  ): Promise<Count> {
-    return this.postRepository.count(where);
+  ): Promise<number> {
+    return (await this.postRepository.count(where)).count;
   }
 
   @get('/posts', {
@@ -125,27 +122,28 @@ export class PostController {
     return posts;
   }
 
-  @patch('/posts', {
-    responses: {
-      '200': {
-        description: 'Post PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  async updateAll(
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Post, {partial: true}),
-        },
-      },
-    })
-    post: Post,
-    @param.where(Post) where?: Where<Post>,
-  ): Promise<Count> {
-    return this.postRepository.updateAll(post, where);
-  }
+  // @patch('/posts', {
+  //   responses: {
+  //     '200': {
+  //       description: 'Post PATCH success count',
+  //       content: {'application/json': {schema: CountSchema}},
+  //     },
+  //   },
+  // })
+
+  // async updateAll(
+  //   @requestBody({
+  //     content: {
+  //       'application/json': {
+  //         schema: getModelSchemaRef(Post, {partial: true}),
+  //       },
+  //     },
+  //   })
+  //   post: Post,
+  //   @param.where(Post) where?: Where<Post>,
+  // ): Promise<Count> {
+  //   return this.postRepository.updateAll(post, where);
+  // }
 
   @get('/posts/{id}', {
     responses: {
@@ -173,6 +171,8 @@ export class PostController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POST['update-by-id'])
   async updateById(
     @param.path.number('id') id: number,
     @requestBody({
@@ -187,19 +187,19 @@ export class PostController {
     await this.postRepository.updateById(id, post);
   }
 
-  @put('/posts/{id}', {
-    responses: {
-      '204': {
-        description: 'Post PUT success',
-      },
-    },
-  })
-  async replaceById(
-    @param.path.number('id') id: number,
-    @requestBody() post: Post,
-  ): Promise<void> {
-    await this.postRepository.replaceById(id, post);
-  }
+  // @put('/posts/{id}', {
+  //   responses: {
+  //     '204': {
+  //       description: 'Post PUT success',
+  //     },
+  //   },
+  // })
+  // async replaceById(
+  //   @param.path.number('id') id: number,
+  //   @requestBody() post: Post,
+  // ): Promise<void> {
+  //   await this.postRepository.replaceById(id, post);
+  // }
 
   @del('/posts/{id}', {
     responses: {
@@ -208,6 +208,8 @@ export class PostController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_POST['delete-by-id'])
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.postRepository.deleteById(id);
   }

@@ -1,17 +1,13 @@
 import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {
   repository
 } from '@loopback/repository';
 import {
   del, getModelSchemaRef, param, post,
-
-
-
-
-
-
   requestBody
 } from '@loopback/rest';
+import {ACL_PHOTO} from '../acls/photo.acl';
 import {PostPhotoThrough} from '../models';
 import {PostPhotoThroughRepository} from '../repositories';
 
@@ -30,6 +26,7 @@ export class PostPhotoThroughController {
     },
   })
   @authenticate("jwt")
+  @authorize(ACL_PHOTO['create'])
   async create(
     @requestBody({
       content: {
@@ -62,7 +59,7 @@ export class PostPhotoThroughController {
     }
   })
   @authenticate("jwt")
-  // @authorize(ACL_USER['create-many'])
+  @authorize(ACL_PHOTO['create-many'])
   async createMany(
     @requestBody({
       content: {
@@ -202,6 +199,7 @@ export class PostPhotoThroughController {
     },
   })
   @authenticate("jwt")
+  @authorize(ACL_PHOTO['delete-by-id'])
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.postPhotoThroughRepository.deleteById(id);
   }

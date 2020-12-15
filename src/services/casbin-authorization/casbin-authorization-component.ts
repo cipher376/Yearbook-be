@@ -8,10 +8,21 @@ import {Binding, BindingScope, Component} from '@loopback/core';
 import {CasbinAuthorizationProvider, CasbinDbEnforcer} from '.';
 
 export class CasbinAuthorizationComponent implements Component {
-  bindings: Binding[] = [
-    Binding.bind('casbin.enforcer.factory').toClass(CasbinDbEnforcer).inScope(BindingScope.SINGLETON),
-    Binding.bind('authorizationProviders.casbin-provider')
-      .toProvider(CasbinAuthorizationProvider)
-      .tag(AuthorizationTags.AUTHORIZER),
-  ];
+
+  bindings: Binding[];
+
+  /**
+   *
+   */
+  constructor() {
+    this.bindings = [
+      Binding.bind('casbin.enforcer.factory').toClass(CasbinDbEnforcer).inScope(BindingScope.SINGLETON),
+      Binding.bind('authorizationProviders.casbin-provider')
+        .toProvider(CasbinAuthorizationProvider)
+        .tag(AuthorizationTags.AUTHORIZER),
+    ];;
+
+    console.log('Authorization bindings setup');
+    // console.log(this.bindings);
+  }
 }

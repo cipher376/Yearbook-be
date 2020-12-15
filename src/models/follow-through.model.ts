@@ -23,10 +23,26 @@ export class FollowThrough extends Entity {
 
   @property({
     type: 'date',
-    required: true,
+    defaultFn: 'now'
   })
   dateFollowed: string;
 
+  @property({
+    type: 'date',
+    defaultFn: 'now'
+  })
+  lastModified: string;
+
+  @property({
+    type: 'boolean',
+    default: true
+  })
+  isFollowing: boolean;
+
+  @property({
+    type: 'string',
+  })
+  leaderModelName: string; // School or User
 
   constructor(data?: Partial<FollowThrough>) {
     super(data);

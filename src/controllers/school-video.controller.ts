@@ -1,4 +1,5 @@
 import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {
   Count,
   CountSchema,
@@ -16,6 +17,7 @@ import {
   post,
   requestBody
 } from '@loopback/rest';
+import {ACL_SCHOOL_VIDEO} from '../acls/school-video.acl';
 import {
   School,
   Video
@@ -25,7 +27,7 @@ import {SchoolRepository} from '../repositories';
 export class SchoolVideoController {
   constructor(
     @repository(SchoolRepository) protected schoolRepository: SchoolRepository,
-  ) {}
+  ) { }
 
   @get('/schools/{id}/videos', {
     responses: {
@@ -39,8 +41,7 @@ export class SchoolVideoController {
       },
     },
   })
-  @authenticate("jwt")
-  // @authorize(ACL_SCHOOL_VIDEO['list-all'])
+
   async find(
     @param.path.number('id') id: number,
     @param.query.object('filter') filter?: Filter<Video>,
@@ -57,7 +58,7 @@ export class SchoolVideoController {
     },
   })
   @authenticate("jwt")
-  // @authorize(ACL_SCHOOL_VIDEO['create'])
+  @authorize(ACL_SCHOOL_VIDEO['create'])
   async create(
     @param.path.number('id') id: typeof School.prototype.id,
     @requestBody({
@@ -109,7 +110,7 @@ export class SchoolVideoController {
     },
   })
   @authenticate("jwt")
-  // @authorize(ACL_SCHOOL_VIDEO['delete-by-id'])
+  @authorize(ACL_SCHOOL_VIDEO['delete-by-id'])
   async delete(
     @param.path.number('id') id: number,
     @param.query.object('where', getWhereSchemaFor(Video)) where?: Where<Video>,

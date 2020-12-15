@@ -1,9 +1,11 @@
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {
   Count,
   CountSchema,
   Filter,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
 import {
   del,
@@ -11,15 +13,15 @@ import {
   getModelSchemaRef,
   getWhereSchemaFor,
   param,
-  patch,
+
   post,
-  requestBody,
+  requestBody
 } from '@loopback/rest';
 import {
-  User,
-  Audio,
+  Audio, User
 } from '../models';
 import {UserRepository} from '../repositories';
+import {ACL_MEDIA} from './../acls/media.acl';
 
 export class UserAudioController {
   constructor(
@@ -53,6 +55,8 @@ export class UserAudioController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_MEDIA['create'])
   async create(
     @param.path.number('id') id: typeof User.prototype.id,
     @requestBody({
@@ -70,28 +74,29 @@ export class UserAudioController {
     return this.userRepository.audio(id).create(audio);
   }
 
-  @patch('/users/{id}/audio', {
-    responses: {
-      '200': {
-        description: 'User.Audio PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  async patch(
-    @param.path.number('id') id: number,
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Audio, {partial: true}),
-        },
-      },
-    })
-    audio: Partial<Audio>,
-    @param.query.object('where', getWhereSchemaFor(Audio)) where?: Where<Audio>,
-  ): Promise<Count> {
-    return this.userRepository.audio(id).patch(audio, where);
-  }
+  // @patch('/users/{id}/audio', {
+  //   responses: {
+  //     '200': {
+  //       description: 'User.Audio PATCH success count',
+  //       content: {'application/json': {schema: CountSchema}},
+  //     },
+  //   },
+  // })
+
+  // async patch(
+  //   @param.path.number('id') id: number,
+  //   @requestBody({
+  //     content: {
+  //       'application/json': {
+  //         schema: getModelSchemaRef(Audio, {partial: true}),
+  //       },
+  //     },
+  //   })
+  //   audio: Partial<Audio>,
+  //   @param.query.object('where', getWhereSchemaFor(Audio)) where?: Where<Audio>,
+  // ): Promise<Count> {
+  //   return this.userRepository.audio(id).patch(audio, where);
+  // }
 
   @del('/users/{id}/audio', {
     responses: {
@@ -101,6 +106,8 @@ export class UserAudioController {
       },
     },
   })
+  @authenticate("jwt")
+  @authorize(ACL_MEDIA['delete-by-id'])
   async delete(
     @param.path.number('id') id: number,
     @param.query.object('where', getWhereSchemaFor(Audio)) where?: Where<Audio>,
