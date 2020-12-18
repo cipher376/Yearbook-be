@@ -47,7 +47,7 @@ export class CasbinAuthorizationProvider implements Provider<Authorizer> {
       return AuthorizationDecision.DENY;
     }
     const subject = this.getUserName(authorizationCtx.principals[0].id);
-    console.log('authorize subject:', subject);
+    // console.log('authorize subject:', subject);
 
     const resourceId = await authorizationCtx.invocationContext.get(
       RESOURCE_ID,
@@ -61,10 +61,10 @@ export class CasbinAuthorizationProvider implements Provider<Authorizer> {
       action: metadata.scopes?.[0] ?? DEFAULT_SCOPE,
     };
 
-    console.debug('authorize request: ', request);
+    // console.debug('authorize request: ', request);
 
     const allowedRoles = metadata.allowedRoles;
-    console.debug('authorize allowed roles: ', allowedRoles)
+    // console.debug('authorize allowed roles: ', allowedRoles)
 
     if (!allowedRoles) return AuthorizationDecision.ALLOW;
     if (allowedRoles.length < 1) return AuthorizationDecision.ALLOW; // No role restrictions
@@ -76,21 +76,21 @@ export class CasbinAuthorizationProvider implements Provider<Authorizer> {
       const objects: string[] = request.object.split('_');
       const id = objects.length > 1 ? objects[1] : ''; // handling ownership, getting logged in user id
 
-      console.log('Objects: ' + JSON.stringify(objects))
+      // console.log('Objects: ' + JSON.stringify(objects))
       const allowedByRole: boolean = await (await this.enforcer).enforce(
         request.subject,
         objects[0],
         request.action
       );
 
-      console.debug(`authorizer role: ${role}, result: ${JSON.stringify(allowedByRole)}`);
+      // console.debug(`authorizer role: ${role}, result: ${JSON.stringify(allowedByRole)}`);
       if (allowedByRole) {
         allow = true;
         break;
       }
     }
 
-    console.debug('final result: ', allow);
+    // console.debug('final result: ', allow);
 
     if (allow) return AuthorizationDecision.ALLOW;
     else if (allow === false) return AuthorizationDecision.DENY;

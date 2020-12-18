@@ -1,6 +1,8 @@
 import {belongsTo, Entity, hasMany, hasOne, model, property} from '@loopback/repository';
 import {Audio} from './audio.model';
+import {Comment} from './comment.model';
 import {Document} from './document.model';
+import {LikeThrough} from './like-through.model';
 import {Photo} from './photo.model';
 import {PostAudioThrough} from './post-audio-through.model';
 import {PostConfig} from './post-config.model';
@@ -9,8 +11,6 @@ import {PostPhotoThrough} from './post-photo-through.model';
 import {PostVideoThrough} from './post-video-through.model';
 import {User} from './user.model';
 import {Video} from './video.model';
-import {Comment} from './comment.model';
-import {LikeThrough} from './like-through.model';
 
 @model()
 export class Post extends Entity {
@@ -37,6 +37,12 @@ export class Post extends Entity {
     defaultFn: 'now',
   })
   dateCreated?: Date;
+
+  @property({
+    type: 'number',
+    default: 0
+  })
+  shareCount?: number;
 
   @belongsTo(() => User)
   userId: number;

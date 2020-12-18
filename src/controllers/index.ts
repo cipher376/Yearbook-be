@@ -47,3 +47,12 @@ export * from './user-user-config.controller';
 export * from './user-video.controller';
 export * from './user.controller';
 
+export * from './notification.controller';
+export * from './push-message.controller';
+export * from './push-message-push-topic.controller';
+export * from './user-device.controller';
+export * from './device-user.controller';
+export * from './device-push-topic.controller';
+export * from './push-topic-device.controller';
+export * from './device.controller';
+export * from './push-topic.controller';

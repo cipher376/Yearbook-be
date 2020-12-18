@@ -1,7 +1,7 @@
 import {Getter, inject} from '@loopback/core';
 import {DefaultCrudRepository, HasManyRepositoryFactory, HasManyThroughRepositoryFactory, HasOneRepositoryFactory, repository, BelongsToAccessor} from '@loopback/repository';
 import {DbDataSource} from '../datasources';
-import {Address, Alumni, Audio, Comment, Document, FollowThrough, LikeThrough, Photo, Post, School, User, UserConfig, UserRelations, Video} from '../models';
+import {Address, Alumni, Audio, Comment, Document, FollowThrough, LikeThrough, Photo, Post, School, User, UserConfig, UserRelations, Video, Device} from '../models';
 import {AddressRepository} from './address.repository';
 import {AlumniRepository} from './alumni.repository';
 import {AudioRepository} from './audio.repository';
@@ -14,6 +14,7 @@ import {PostRepository} from './post.repository';
 import {SchoolRepository} from './school.repository';
 import {UserConfigRepository} from './user-config.repository';
 import {VideoRepository} from './video.repository';
+import {DeviceRepository} from './device.repository';
 
 export class UserRepository extends DefaultCrudRepository<
   User,
@@ -55,14 +56,18 @@ export class UserRepository extends DefaultCrudRepository<
 
   public readonly alumni: BelongsToAccessor<Alumni, typeof User.prototype.id>;
 
+  public readonly devices: HasManyRepositoryFactory<Device, typeof User.prototype.id>;
+
   constructor(
     @inject('datasources.db') dataSource: DbDataSource,
     @repository.getter('PostRepository') protected postRepositoryGetter: Getter<PostRepository>,
     @repository.getter('UserConfigRepository') protected userConfigRepositoryGetter: Getter<UserConfigRepository>,
     @repository.getter('PhotoRepository') protected photoRepositoryGetter: Getter<PhotoRepository>, @repository.getter('AddressRepository') protected addressRepositoryGetter: Getter<AddressRepository>, @repository.getter('AlumniRepository') protected alumniRepositoryGetter: Getter<AlumniRepository>,
-    @repository.getter('SchoolRepository') protected schoolRepositoryGetter: Getter<SchoolRepository>, @repository.getter('VideoRepository') protected videoRepositoryGetter: Getter<VideoRepository>, @repository.getter('AudioRepository') protected audioRepositoryGetter: Getter<AudioRepository>, @repository.getter('DocumentRepository') protected documentRepositoryGetter: Getter<DocumentRepository>, @repository.getter('CommentRepository') protected commentRepositoryGetter: Getter<CommentRepository>, @repository.getter('LikeThroughRepository') protected likeThroughRepositoryGetter: Getter<LikeThroughRepository>, @repository.getter('FollowThroughRepository') protected followThroughRepositoryGetter: Getter<FollowThroughRepository>,
+    @repository.getter('SchoolRepository') protected schoolRepositoryGetter: Getter<SchoolRepository>, @repository.getter('VideoRepository') protected videoRepositoryGetter: Getter<VideoRepository>, @repository.getter('AudioRepository') protected audioRepositoryGetter: Getter<AudioRepository>, @repository.getter('DocumentRepository') protected documentRepositoryGetter: Getter<DocumentRepository>, @repository.getter('CommentRepository') protected commentRepositoryGetter: Getter<CommentRepository>, @repository.getter('LikeThroughRepository') protected likeThroughRepositoryGetter: Getter<LikeThroughRepository>, @repository.getter('FollowThroughRepository') protected followThroughRepositoryGetter: Getter<FollowThroughRepository>, @repository.getter('DeviceRepository') protected deviceRepositoryGetter: Getter<DeviceRepository>,
   ) {
     super(User, dataSource);
+    this.devices = this.createHasManyRepositoryFactoryFor('devices', deviceRepositoryGetter,);
+    this.registerInclusionResolver('devices', this.devices.inclusionResolver);
     this.alumni = this.createBelongsToAccessorFor('alumni', alumniRepositoryGetter,);
     this.registerInclusionResolver('alumni', this.alumni.inclusionResolver);
     this.followedSchools = this.createHasManyThroughRepositoryFactoryFor('followedSchools', schoolRepositoryGetter, followThroughRepositoryGetter,);

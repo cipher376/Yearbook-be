@@ -9,6 +9,7 @@ export * from './friendship-through.model';
 export * from './g-point.model';
 export * from './like-through.model';
 export * from './media.model';
+export * from './notification.model';
 export * from './photo.model';
 export * from './post-audio-through.model';
 export * from './post-config.model';
@@ -25,3 +26,7 @@ export * from './video.model';
 export * from './website.model';
 
 
+export * from './push-message.model';
+export * from './push-topic.model';
+export * from './device.model';
+export * from './device-topic-through.model';

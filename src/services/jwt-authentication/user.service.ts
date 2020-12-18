@@ -1,5 +1,5 @@
 import {UserService} from '@loopback/authentication';
-import {inject} from '@loopback/core';
+import {inject, injectable} from '@loopback/core';
 import {Filter, repository} from '@loopback/repository';
 import {HttpErrors} from '@loopback/rest';
 import {securityId, UserProfile} from '@loopback/security';
@@ -15,16 +15,17 @@ export type Credentials = {
 }
 
 
+@injectable()
 export class MyUserService implements UserService<User, Credentials>{
+    @repository(UserRepository)
+    public userRepository: UserRepository;
+
+    // @inject('service.hasher')
+    @inject(PasswordHasherBindings.PASSWORD_HASHER)
+    public hasher: BcryptHasher;
+
     constructor(
-        @repository(UserRepository)
-        public userRepository: UserRepository,
-
-        // @inject('service.hasher')
-        @inject(PasswordHasherBindings.PASSWORD_HASHER)
-        public hasher: BcryptHasher
-
-    ) {}
+    ) { }
 
 
     async verifyCredentials(credentials: Credentials): Promise<User> {

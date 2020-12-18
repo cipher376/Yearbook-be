@@ -3,13 +3,15 @@ import {ApplicationConfig} from '.';
 
 const originsWhitelist = [
   'http://localhost:8100',      //this is my front-end url for development
+  'http://localhost:42001',      //this is my front-end url for development
   'http://www.devtek-limited.com',
   'http://www.devtek-limited.tech',
   'http://yearbook-api.devtek-limited.tech',
   'https://localhost:8100',      //this is my front-end url for development
   'https://www.devtek-limited.com',
   'https://www.devtek-limited.tech',
-  'https://yearbook-api.devtek-limited.tech'
+  'https://yearbook-api.devtek-limited.tech',
+  '*'
 ];
 
 
@@ -17,7 +19,7 @@ export const APP_CONFIG: ApplicationConfig =
 {
   fileStorageDirectory: path.join(__dirname, '../files'),
   rest: {
-    port: +(process.env.PORT ?? 3000),
+    port: +(process.env.PORT ?? 3001),
     host: process.env.HOST,
     // The `gracePeriodForClose` provides a graceful close for http/https
     // servers with keep-alive clients. The default value is `Infinity`
@@ -41,7 +43,7 @@ export const APP_CONFIG: ApplicationConfig =
     maxAge: 86400,
     credentials: true,
     exposedHeaders: ['Content-Length', 'Cache-Control', 'Content-Language', 'Content-Type', 'Expires',
-      'Last-Modified', 'Authorization', 'Access-Control-Allow-Origin']
+      'Last-Modified', 'Authorization', 'Access-Control-Allow-Origin', 'Access-Control-Credentials']
   }
 };
 

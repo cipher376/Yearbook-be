@@ -12,6 +12,7 @@ import {Post} from './post.model';
 import {School} from './school.model';
 import {UserConfig} from './user-config.model';
 import {Video} from './video.model';
+import {Device} from './device.model';
 
 @model()
 export class User extends Entity {
@@ -193,6 +194,9 @@ export class User extends Entity {
 
   @belongsTo(() => Alumni)
   alumniId: number;
+
+  @hasMany(() => Device, {keyTo: 'playerId'})
+  devices: Device[];
   //Relation property
 
   constructor(data?: Partial<User>) {

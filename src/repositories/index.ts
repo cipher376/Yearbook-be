@@ -22,3 +22,8 @@ export * from './comment.repository';
 export * from './friendship-through.repository';
 export * from './follow-through.repository';
 export * from './like-through.repository';
+export * from './notification.repository';
+export * from './push-message.repository';
+export * from './push-topic.repository';
+export * from './device.repository';
+export * from './device-topic-through.repository';

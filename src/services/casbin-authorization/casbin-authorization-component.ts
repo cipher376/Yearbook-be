@@ -22,7 +22,7 @@ export class CasbinAuthorizationComponent implements Component {
         .tag(AuthorizationTags.AUTHORIZER),
     ];;
 
-    console.log('Authorization bindings setup');
+    // console.log('Authorization bindings setup');
     // console.log(this.bindings);
   }
 }

@@ -10,10 +10,10 @@ const verifyAsync = promisify(jwt.verify);
 export class MyJWTService {
   // @inject('authentication.jwt.secret')
   @inject(TokenServiceBindings.TOKEN_SECRET)
-  public readonly jwtSecret: string;
+  public jwtSecret: string;
 
   @inject(TokenServiceBindings.TOKEN_EXPIRES_IN)
-  public readonly expiresSecret: string;
+  public expiresSecret: string;
 
   async generateToken(userProfile: UserProfile): Promise<string> {
     if (!userProfile) {

@@ -16,7 +16,7 @@ export const ACL_POST = {
   'update-by-id': {
     resource: RESOURCE_NAME,
     scopes: ['update-by-id'],
-    allowedRoles: ['admin', 'schoolAdmin'], // school post
+    allowedRoles: ['authUser'], // school post
     voters: [assignInstanceId],
   },
   'delete-by-id': {

@@ -26,8 +26,8 @@ export async function getCasbinEnforcerByFileName(
     schoolAdmin: createEnforcerByRole(POLICY_PATHS.schoolAdmin),
     admin: createEnforcerByRole(POLICY_PATHS.admin),
   };
-  console.log('getCasbinEnforcerByName: ', CASBIN_ENFORCERS);
-  console.log('getCasbinEnforcerByName: ', name);
+  // console.log('getCasbinEnforcerByName: ', CASBIN_ENFORCERS);
+  // console.log('getCasbinEnforcerByName: ', name);
 
   if (Object.prototype.hasOwnProperty.call(CASBIN_ENFORCERS, name))
     return CASBIN_ENFORCERS[name];

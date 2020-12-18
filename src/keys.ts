@@ -6,6 +6,8 @@ import {Credentials} from './services/jwt-authentication/user.service';
 import {FileUploadHandler} from './types';
 
 
+
+
 export namespace TokenServiceConstants {
     export const TOKEN_SECRET_VALUE = '138asda8213';
     export const TOKEN_EXPIRES_IN_VALUE = '7h';
@@ -45,3 +47,9 @@ export const STORAGE_DIRECTORY = BindingKey.create<string>('storage.directory');
  * Used by Authorization system (casbin)
  */
 export const RESOURCE_ID = BindingKey.create<string>('resourceId');
+
+
+/***
+ * Used by Emailer, SMS sender, Push notification, Node mailer, Amazon aws simple
+ * email service
+ */

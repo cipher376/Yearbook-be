@@ -1,5 +1,6 @@
-import {authenticate} from '@loopback/authentication';
+import {authenticate, AuthenticationBindings} from '@loopback/authentication';
 import {authorize} from '@loopback/authorization';
+import {inject} from '@loopback/core';
 import {
   CountSchema,
   Filter,
@@ -14,12 +15,17 @@ import {
 
   requestBody
 } from '@loopback/rest';
+import {securityId, UserProfile} from '@loopback/security';
+import * as casbin from 'casbin';
 import {Post} from '../models';
 import {PostAudioThroughRepository, PostRepository, PostVideoThroughRepository} from '../repositories';
+import {CasbinDbEnforcer} from '../services/casbin-authorization';
 import {ACL_POST} from './../acls/post.acl';
 import {PostPhotoThroughRepository} from './../repositories/post-photo-through.repository';
 
 export class PostController {
+  enforcer: Promise<casbin.Enforcer>;
+
   constructor(
     @repository(PostRepository)
     public postRepository: PostRepository,
@@ -29,7 +35,11 @@ export class PostController {
     public postVideoThroughRepository: PostVideoThroughRepository,
     @repository(PostAudioThroughRepository)
     public postAudioThroughRepository: PostAudioThroughRepository,
-  ) { }
+    @inject('casbin.enforcer.factory')
+    private enforcerService: CasbinDbEnforcer,
+  ) {
+    this.enforcer = enforcerService.enforcerFactory();
+  }
 
   @post('/posts', {
     responses: {
@@ -183,8 +193,24 @@ export class PostController {
       },
     })
     post: Post,
-  ): Promise<void> {
-    await this.postRepository.updateById(id, post);
+    @inject(AuthenticationBindings.CURRENT_USER)
+    currentUser: UserProfile,
+  ): Promise<Post> {
+    console.log(currentUser)
+    let update = false;
+    if (currentUser[securityId] as any === post.userId) { // owner
+      update = true;
+    } else { // admin or school admin
+      if ((await this.enforcer).hasPolicy('g', 'u' + currentUser[securityId], 'admin')
+        // (await this.enforcer).hasPolicy('g', 'u' + currentUser[securityId], 'schoolAdmin')
+      ) {
+        update = true;
+      }
+    }
+    if (update) {
+      await this.postRepository.updateById(id, post);
+    }
+    return post;
   }
 
   // @put('/posts/{id}', {
@@ -200,6 +226,34 @@ export class PostController {
   // ): Promise<void> {
   //   await this.postRepository.replaceById(id, post);
   // }
+
+  @patch('/posts/update-share-count/{id}', {
+    responses: {
+      '204': {
+        description: 'Post PATCH success',
+      },
+    },
+  })
+  @authenticate("jwt")
+  @authorize(ACL_POST['update-by-id'])
+  async increaseShareCount(
+    @param.path.number('id') id: number,
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(Post, {partial: true}),
+        },
+      },
+    })
+    post: Post,
+  ): Promise<void> {
+    try {
+      (post.shareCount as number) += 1;
+      await this.postRepository.updateById(id, post);
+    } catch (e) {
+      console.log(e);
+    }
+  }
 
   @del('/posts/{id}', {
     responses: {
