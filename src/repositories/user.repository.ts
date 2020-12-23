@@ -1,11 +1,12 @@
 import {Getter, inject} from '@loopback/core';
-import {DefaultCrudRepository, HasManyRepositoryFactory, HasManyThroughRepositoryFactory, HasOneRepositoryFactory, repository, BelongsToAccessor} from '@loopback/repository';
+import {BelongsToAccessor, DefaultCrudRepository, HasManyRepositoryFactory, HasManyThroughRepositoryFactory, HasOneRepositoryFactory, repository} from '@loopback/repository';
 import {DbDataSource} from '../datasources';
-import {Address, Alumni, Audio, Comment, Document, FollowThrough, LikeThrough, Photo, Post, School, User, UserConfig, UserRelations, Video, Device} from '../models';
+import {Address, Alumni, Audio, Comment, Device, Document, FollowThrough, LikeThrough, Photo, Post, School, User, UserRelations, Video, UserConfig} from '../models';
 import {AddressRepository} from './address.repository';
 import {AlumniRepository} from './alumni.repository';
 import {AudioRepository} from './audio.repository';
 import {CommentRepository} from './comment.repository';
+import {DeviceRepository} from './device.repository';
 import {DocumentRepository} from './document.repository';
 import {FollowThroughRepository} from './follow-through.repository';
 import {LikeThroughRepository} from './like-through.repository';
@@ -14,7 +15,6 @@ import {PostRepository} from './post.repository';
 import {SchoolRepository} from './school.repository';
 import {UserConfigRepository} from './user-config.repository';
 import {VideoRepository} from './video.repository';
-import {DeviceRepository} from './device.repository';
 
 export class UserRepository extends DefaultCrudRepository<
   User,
@@ -25,7 +25,6 @@ export class UserRepository extends DefaultCrudRepository<
 
   public readonly post: HasOneRepositoryFactory<Post, typeof User.prototype.id>;
 
-  public readonly userConfig: HasOneRepositoryFactory<UserConfig, typeof User.prototype.id>;
 
   public readonly address: HasOneRepositoryFactory<Address, typeof User.prototype.id>;
 
@@ -58,6 +57,8 @@ export class UserRepository extends DefaultCrudRepository<
 
   public readonly devices: HasManyRepositoryFactory<Device, typeof User.prototype.id>;
 
+  public readonly userConfigs: HasManyRepositoryFactory<UserConfig, typeof User.prototype.id>;
+
   constructor(
     @inject('datasources.db') dataSource: DbDataSource,
     @repository.getter('PostRepository') protected postRepositoryGetter: Getter<PostRepository>,
@@ -66,6 +67,8 @@ export class UserRepository extends DefaultCrudRepository<
     @repository.getter('SchoolRepository') protected schoolRepositoryGetter: Getter<SchoolRepository>, @repository.getter('VideoRepository') protected videoRepositoryGetter: Getter<VideoRepository>, @repository.getter('AudioRepository') protected audioRepositoryGetter: Getter<AudioRepository>, @repository.getter('DocumentRepository') protected documentRepositoryGetter: Getter<DocumentRepository>, @repository.getter('CommentRepository') protected commentRepositoryGetter: Getter<CommentRepository>, @repository.getter('LikeThroughRepository') protected likeThroughRepositoryGetter: Getter<LikeThroughRepository>, @repository.getter('FollowThroughRepository') protected followThroughRepositoryGetter: Getter<FollowThroughRepository>, @repository.getter('DeviceRepository') protected deviceRepositoryGetter: Getter<DeviceRepository>,
   ) {
     super(User, dataSource);
+    this.userConfigs = this.createHasManyRepositoryFactoryFor('userConfigs', userConfigRepositoryGetter,);
+    this.registerInclusionResolver('userConfigs', this.userConfigs.inclusionResolver);
     this.devices = this.createHasManyRepositoryFactoryFor('devices', deviceRepositoryGetter,);
     this.registerInclusionResolver('devices', this.devices.inclusionResolver);
     this.alumni = this.createBelongsToAccessorFor('alumni', alumniRepositoryGetter,);
@@ -90,8 +93,6 @@ export class UserRepository extends DefaultCrudRepository<
     this.registerInclusionResolver('photos', this.photos.inclusionResolver);
     this.address = this.createHasOneRepositoryFactoryFor('address', addressRepositoryGetter);
     this.registerInclusionResolver('address', this.address.inclusionResolver);
-    this.userConfig = this.createHasOneRepositoryFactoryFor('userConfig', userConfigRepositoryGetter);
-    this.registerInclusionResolver('userConfig', this.userConfig.inclusionResolver);
     this.post = this.createHasOneRepositoryFactoryFor('post', postRepositoryGetter);
     this.registerInclusionResolver('post', this.post.inclusionResolver);
 

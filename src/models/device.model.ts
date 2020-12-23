@@ -1,7 +1,7 @@
-import {Entity, model, property, belongsTo, hasMany} from '@loopback/repository';
-import {User} from './user.model';
-import {PushTopic} from './push-topic.model';
+import {belongsTo, Entity, hasMany, model, property} from '@loopback/repository';
 import {DeviceTopicThrough} from './device-topic-through.model';
+import {PushTopic} from './push-topic.model';
+import {User} from './user.model';
 
 @model()
 export class Device extends Entity {

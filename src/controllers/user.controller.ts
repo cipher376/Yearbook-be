@@ -19,11 +19,12 @@ import _ from 'lodash';
 import {ACL_USER} from '../acls';
 import {PasswordHasherBindings, TokenServiceBindings, UserServiceBindings} from '../keys';
 import {User} from '../models';
-import {UserRepository} from '../repositories';
+import {UserConfigRepository, UserRepository} from '../repositories';
 import {validateCredentials} from '../services';
 import {BcryptHasher} from '../services/hash.password';
 import {Credentials, MyJWTService, MyUserService} from '../services/jwt-authentication';
 import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
+import {PhotoRepository} from './../repositories/photo.repository';
 import {CasbinDbEnforcer} from './../services/casbin-authorization/casbin.enforcers';
 
 const applyFilter = require('loopback-filters');
@@ -46,6 +47,12 @@ export class UserController {
     // @inject('service.jwt.service')
     @inject(TokenServiceBindings.TOKEN_SERVICE)
     public jwtService: MyJWTService,
+
+    @repository(PhotoRepository)
+    public photoRepository: PhotoRepository,
+
+    @repository(UserConfigRepository)
+    public userConfigRepository: UserConfigRepository,
 
     @inject('casbin.enforcer.factory')
     private enforcerService: CasbinDbEnforcer,
@@ -85,7 +92,7 @@ export class UserController {
       console.debug(error);
     })
 
-    delete savedUser.password;
+    savedUser.password = undefined;
     return savedUser;
   }
 
@@ -119,13 +126,25 @@ export class UserController {
     // make sure user exist,password should be valid
     const user = await this.userService.verifyCredentials(credentials);
 
-    delete user.password;
+    user.password = undefined;
     // console.log(user);
     const userProfile = this.userService.convertToUserProfile(user);
     // console.log(userProfile);
 
     const token = await this.jwtService.generateToken(userProfile);
-    return Promise.resolve({token: token})
+
+    // check if user is deactivated
+    const config = await this.userConfigRepository.findOne({
+      where: {
+        action: 'AccountDeactivation',
+        userId: user?.id ?? userProfile?.id
+      }
+    })
+    if (config) {
+      throw new HttpErrors.Locked('Account deactivated');
+    } else {
+      return Promise.resolve({token: token})
+    }
   }
 
 
@@ -148,8 +167,8 @@ export class UserController {
     @inject(AuthenticationBindings.CURRENT_USER)
     currentUser: UserProfile,
   ): Promise<UserProfile> {
-    this.jwtService.expiresSecret;
-    delete currentUser?.password
+    // this.jwtService.expiresSecret;
+    currentUser.password = undefined;
     return Promise.resolve(currentUser);
   }
 
@@ -173,7 +192,7 @@ export class UserController {
     @inject(AuthenticationBindings.CURRENT_USER)
     currentUser: UserProfile,
   ): Promise<UserProfile> {
-    delete currentUser?.password
+    currentUser.password = undefined;
     return Promise.resolve(currentUser);
   }
 
@@ -205,8 +224,8 @@ export class UserController {
     }, error => {
       console.debug(error);
     });
-    await this.userRepository.userConfig(currentUser.id).get().then(config => {
-      user.userConfig = config
+    await this.userRepository.userConfigs(currentUser.id).find().then(config => {
+      user.userConfigs = config
     }, error => {
       console.debug(error);
     })
@@ -216,7 +235,7 @@ export class UserController {
     }, error => {
       console.debug(error);
     })
-    delete user.password;
+    user.password = undefined;
     return Promise.resolve(user);
   }
 
@@ -277,6 +296,8 @@ export class UserController {
   @authorize(ACL_USER['update-by-id'])
   async updateById(
     @param.path.number('id') id: number,
+    @inject(AuthenticationBindings.CURRENT_USER)
+    currentUser: UserProfile,
     @requestBody({
       content: {
         'application/json': {
@@ -286,10 +307,10 @@ export class UserController {
     })
     user: User,
   ): Promise<User> {
-
+    // console.log(currentUser)
     // clear the sensitive fields
-    const returnUser = await this.userService.updateUser(id, user);
-    delete returnUser.password;
+    const returnUser = await this.userService.updateUser(id, user, currentUser.id);
+    returnUser.password = undefined;
     return returnUser;
   }
 
@@ -452,7 +473,7 @@ export class UserController {
     users = [];
     foundUsers = applyFilter(foundUsers, filter);
     foundUsers.forEach(fs => {
-      delete fs.user?.password;
+      fs.user.password = undefined;
       users.push(fs.user);
     })
     return users;
@@ -512,7 +533,7 @@ export class UserController {
     // console.log(filter);
     const users = await this.userService.getUsers(filter);
     users.map(user => {
-      delete user?.password;
+      user.password = undefined;
     })
 
     return users;
@@ -560,7 +581,7 @@ export class UserController {
         }
         user.password = await this.hasher.hashPassword(user.password as string)
         const savedUser = await this.userRepository.create(user);
-        delete savedUser.password;
+        savedUser.password = undefined;
         res.push(savedUser.id as number);
 
       } catch (error) {
@@ -568,6 +589,28 @@ export class UserController {
       }
     }
     return {res, errors};
+  }
+
+  @get('/users/clear-profile-photos/{id}', {
+    responses: {
+      '204': {
+        description: 'User PATCH success',
+      },
+    },
+  })
+  @authenticate("jwt")
+  async clearUserProfilePhotos(
+    @param.path.number('id') id: number,
+    @inject(AuthenticationBindings.CURRENT_USER)
+    currentUser: UserProfile,
+  ) {
+    if (id !== currentUser?.id) { // owner ship
+      return;
+    }
+    await this.photoRepository.updateAll({profile: false}, {userId: currentUser?.id}).catch(er => {
+      console.log(er);
+    })
+    return
   }
 
 

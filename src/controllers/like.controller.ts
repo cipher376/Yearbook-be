@@ -1,5 +1,6 @@
-import {authenticate} from '@loopback/authentication';
+import {authenticate, AuthenticationBindings} from '@loopback/authentication';
 import {authorize} from '@loopback/authorization';
+import {inject} from '@loopback/core';
 import {
   Count,
   CountSchema,
@@ -14,6 +15,7 @@ import {
   patch, post,
   requestBody
 } from '@loopback/rest';
+import {UserProfile} from '@loopback/security';
 import {ACL_LIKE} from '../acls/like.acl';
 import {LikeThrough} from '../models';
 import {LikeThroughRepository} from '../repositories';
@@ -47,6 +49,7 @@ export class LikeController {
     })
     likeThrough: Omit<LikeThrough, 'id'>,
   ): Promise<LikeThrough> {
+    console.log(likeThrough);
     return this.likeThroughRepository.create(likeThrough);
   }
 
@@ -142,6 +145,8 @@ export class LikeController {
   @authorize(ACL_LIKE['update-by-id'])
   async updateById(
     @param.path.number('id') id: number,
+    @inject(AuthenticationBindings.CURRENT_USER)
+    currentUser: UserProfile,
     @requestBody({
       content: {
         'application/json': {
@@ -151,6 +156,9 @@ export class LikeController {
     })
     likeThrough: LikeThrough,
   ): Promise<void> {
+    if (likeThrough?.initiatorId !== currentUser?.id) { // ownership
+      return;
+    }
     await this.likeThroughRepository.updateById(id, likeThrough);
   }
 

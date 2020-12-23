@@ -26,6 +26,7 @@ export class UserAddressController {
     @repository(UserRepository) protected userRepository: UserRepository,
   ) { }
 
+  // @authenticate("jwt")
   @get('/users/{id}/address', {
     responses: {
       '200': {
@@ -38,8 +39,6 @@ export class UserAddressController {
       },
     },
   })
-  // @authenticate("jwt")
-  // @authorize(ACL_USER_ADDRESS['list-all'])
   async get(
     @param.path.number('id') id: number,
     @param.query.object('filter') filter?: Filter<Address>,
@@ -56,7 +55,7 @@ export class UserAddressController {
     },
   })
   @authenticate("jwt")
-  @authorize(ACL_USER_ADDRESS['create'])
+  // @authorize(ACL_USER_ADDRESS['create'])
   async create(
     @param.path.number('id') id: typeof User.prototype.id,
     @requestBody({

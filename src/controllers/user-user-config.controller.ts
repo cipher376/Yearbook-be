@@ -1,6 +1,7 @@
-import {authenticate} from '@loopback/authentication';
-import {authorize} from '@loopback/authorization/dist/decorators/authorize';
+import {authenticate, AuthenticationBindings} from '@loopback/authentication';
+import {inject} from '@loopback/core';
 import {
+  Count,
   CountSchema,
   Filter,
   repository,
@@ -11,43 +12,53 @@ import {
   get,
   getModelSchemaRef,
   getWhereSchemaFor,
+  HttpErrors,
   param,
   patch,
   post,
   requestBody
 } from '@loopback/rest';
+import {UserProfile} from '@loopback/security';
 import {
   User,
   UserConfig
 } from '../models';
 import {UserRepository} from '../repositories';
-import {ACL_USER_CONFIG} from './../acls/user-config.acl';
 
 export class UserUserConfigController {
   constructor(
     @repository(UserRepository) protected userRepository: UserRepository,
   ) { }
 
-  @get('/users/{id}/user-config', {
+
+  @authenticate("jwt")
+  @get('/users/{id}/user-configs', {
     responses: {
       '200': {
-        description: 'User has one UserConfig',
+        description: 'Array of User has many UserConfig',
         content: {
           'application/json': {
-            schema: getModelSchemaRef(UserConfig),
+            schema: {type: 'array', items: getModelSchemaRef(UserConfig)},
           },
         },
       },
     },
   })
-  async get(
+  async find(
+    @inject(AuthenticationBindings.CURRENT_USER)
+    currentUser: UserProfile,
     @param.path.number('id') id: number,
     @param.query.object('filter') filter?: Filter<UserConfig>,
-  ): Promise<UserConfig> {
-    return this.userRepository.userConfig(id).get(filter);
+
+  ): Promise<UserConfig[]> {
+    if (id === currentUser?.id) {
+      return this.userRepository.userConfigs(id).find(filter);
+    }
+    return [];
   }
 
-  @post('/users/{id}/user-config', {
+  @authenticate("jwt")
+  @post('/users/{id}/user-configs', {
     responses: {
       '200': {
         description: 'User model instance',
@@ -55,8 +66,9 @@ export class UserUserConfigController {
       },
     },
   })
-  @authenticate("jwt")
   async create(
+    @inject(AuthenticationBindings.CURRENT_USER)
+    currentUser: UserProfile,
     @param.path.number('id') id: typeof User.prototype.id,
     @requestBody({
       content: {
@@ -70,10 +82,14 @@ export class UserUserConfigController {
       },
     }) userConfig: Omit<UserConfig, 'id'>,
   ): Promise<UserConfig> {
-    return this.userRepository.userConfig(id).create(userConfig);
+    if (id === currentUser?.id) {
+      return this.userRepository.userConfigs(id).create(userConfig);
+    }
+    throw HttpErrors[403];
   }
 
-  @patch('/users/{id}/user-config', {
+  @authenticate("jwt")
+  @patch('/users/{id}/user-configs', {
     responses: {
       '200': {
         description: 'User.UserConfig PATCH success count',
@@ -81,9 +97,9 @@ export class UserUserConfigController {
       },
     },
   })
-  @authenticate("jwt")
-  @authorize(ACL_USER_CONFIG['update-by-id'])
   async patch(
+    @inject(AuthenticationBindings.CURRENT_USER)
+    currentUser: UserProfile,
     @param.path.number('id') id: number,
     @requestBody({
       content: {
@@ -94,11 +110,15 @@ export class UserUserConfigController {
     })
     userConfig: Partial<UserConfig>,
     @param.query.object('where', getWhereSchemaFor(UserConfig)) where?: Where<UserConfig>,
-  ): Promise<number> {
-    return (await this.userRepository.userConfig(id).patch(userConfig, where)).count;
+  ): Promise<Count> {
+    if (id === currentUser?.id) {
+      return this.userRepository.userConfigs(id).patch(userConfig, where);
+    }
+    throw HttpErrors[403];
   }
 
-  @del('/users/{id}/user-config', {
+  @authenticate("jwt")
+  @del('/users/{id}/user-configs', {
     responses: {
       '200': {
         description: 'User.UserConfig DELETE success count',
@@ -106,12 +126,15 @@ export class UserUserConfigController {
       },
     },
   })
-  @authenticate("jwt")
-  @authorize(ACL_USER_CONFIG['delete-by-id'])
   async delete(
+    @inject(AuthenticationBindings.CURRENT_USER)
+    currentUser: UserProfile,
     @param.path.number('id') id: number,
     @param.query.object('where', getWhereSchemaFor(UserConfig)) where?: Where<UserConfig>,
-  ): Promise<number> {
-    return (await this.userRepository.userConfig(id).delete(where)).count
+  ): Promise<Count> {
+    if (id === currentUser?.id) {
+      return this.userRepository.userConfigs(id).delete(where);
+    }
+    throw HttpErrors[403];
   }
 }

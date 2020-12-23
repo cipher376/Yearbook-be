@@ -3,6 +3,7 @@ import {Address} from './address.model';
 import {Alumni} from './alumni.model';
 import {Audio} from './audio.model';
 import {Comment} from './comment.model';
+import {Device} from './device.model';
 import {Document} from './document.model';
 import {FollowThrough} from './follow-through.model';
 import {FriendshipThrough} from './friendship-through.model';
@@ -10,9 +11,8 @@ import {LikeThrough} from './like-through.model';
 import {Photo} from './photo.model';
 import {Post} from './post.model';
 import {School} from './school.model';
-import {UserConfig} from './user-config.model';
 import {Video} from './video.model';
-import {Device} from './device.model';
+import {UserConfig} from './user-config.model';
 
 @model()
 export class User extends Entity {
@@ -88,7 +88,7 @@ export class User extends Entity {
     type: 'string',
     jsonSchema: {
       maxLength: 10,
-      minLength: 1,
+      minLength: 0,
     },
   })
   gender?: string;
@@ -104,7 +104,7 @@ export class User extends Entity {
     type: 'string',
     jsonSchema: {
       maxLength: 50,
-      minLength: 1,
+      minLength: 0,
     },
   })
   nickName?: string;
@@ -135,8 +135,6 @@ export class User extends Entity {
   @hasOne(() => Post)
   post: Post;
 
-  @hasOne(() => UserConfig)
-  userConfig: UserConfig;
 
   @hasMany(() => Photo)
   photos: Photo[];
@@ -197,6 +195,9 @@ export class User extends Entity {
 
   @hasMany(() => Device, {keyTo: 'playerId'})
   devices: Device[];
+
+  @hasMany(() => UserConfig)
+  userConfigs: UserConfig[];
   //Relation property
 
   constructor(data?: Partial<User>) {

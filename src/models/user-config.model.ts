@@ -10,10 +10,21 @@ export class UserConfig extends Entity {
   id?: number;
 
   @property({
-    type: 'boolean',
-    default: true,
+    type: 'string',
+    required: true
   })
-  fetchPublicPost?: boolean;
+  action: string;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
+  response: string;
+
+  @property({
+    type: 'string',
+  })
+  reason: string;
 
   @property({
     type: 'number',
@@ -30,4 +41,3 @@ export interface UserConfigRelations {
 }
 
 export type UserConfigWithRelations = UserConfig & UserConfigRelations;
-  

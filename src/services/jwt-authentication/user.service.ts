@@ -119,15 +119,16 @@ export class MyUserService implements UserService<User, Credentials>{
         return Promise.resolve(true);
     }
 
-    async phoneExist(phone: string): Promise<boolean> {
+    async phoneExist(phone: string, currentUserId: any): Promise<boolean> {
         const foundUser = await this.userRepository.findOne({
             where: {phone}
         })
         if (!foundUser) return Promise.resolve(false);
+        if (foundUser.id == currentUserId) return Promise.resolve(false);
         return Promise.resolve(true);
     }
 
-    async updateUser(id: typeof User.prototype.id, user: User): Promise<User> {
+    async updateUser(id: typeof User.prototype.id, user: User, currentUserId: string): Promise<User> {
         const foundUser = await this.userRepository.findOne({
             where: {id}
         });
@@ -136,7 +137,7 @@ export class MyUserService implements UserService<User, Credentials>{
             throw new HttpErrors.NotFound('user not found.');
         }
         // check if phone number is in used
-        if (await this.phoneExist(user.phone)) {
+        if (await this.phoneExist(user.phone, user.id) && !(user.id && currentUserId)) {
             throw new HttpErrors.NotFound('Phone number is already taken.');
         }
 
@@ -148,6 +149,7 @@ export class MyUserService implements UserService<User, Credentials>{
         foundUser.username = user.username ?? foundUser.username
         foundUser.username = user.username ?? foundUser.username
         foundUser.phone = user.phone ?? foundUser.phone
+        foundUser.gender = user.gender ?? foundUser.gender
 
         await this.userRepository.update(foundUser);
         return this.convertToUserView(foundUser);
