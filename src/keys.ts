@@ -9,7 +9,7 @@ import {FileUploadHandler} from './types';
 
 
 export namespace TokenServiceConstants {
-    export const TOKEN_SECRET_VALUE = '138asda8213';
+    export const TOKEN_SECRET_VALUE = '138asda8213QDF%%&&$$$kHKjhjkop1445';
     export const TOKEN_EXPIRES_IN_VALUE = '7h';
 }
 
@@ -53,3 +53,18 @@ export const RESOURCE_ID = BindingKey.create<string>('resourceId');
  * Used by Emailer, SMS sender, Push notification, Node mailer, Amazon aws simple
  * email service
  */
+
+
+
+
+export enum OPERATION_STATE {
+    pending = 0,
+    success = 1,
+    failed = 2,
+}
+
+export enum RESET_REQUEST_TYPE {
+    password = 1,
+    email = 2,
+    phone = 3
+}

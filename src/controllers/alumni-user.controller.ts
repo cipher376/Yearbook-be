@@ -40,7 +40,6 @@ export class AlumniUserController {
     @param.query.object('filter') filter?: Filter<User>,
   ): Promise<User> {
     const user = await this.alumniRepository.user(id).get(filter);
-    delete user.password;
     return user;
   }
 

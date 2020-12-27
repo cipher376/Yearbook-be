@@ -82,7 +82,8 @@
     "socket.io": "^3.0.4",
     "thumbler": "^1.1.2",
     "tslib": "^2.0.0",
-    "typeorm-adapter": "^1.2.0"
+    "typeorm-adapter": "^1.2.0",
+    "uid": "^2.0.0"
   },
   "devDependencies": {
     "@loopback/build": "^6.2.8",

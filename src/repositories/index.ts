@@ -27,3 +27,6 @@ export * from './push-message.repository';
 export * from './push-topic.repository';
 export * from './device.repository';
 export * from './device-topic-through.repository';
+export * from './reset-request.repository';
+export * from './authentication.repository';
+export * from './password.repository';

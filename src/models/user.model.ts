@@ -8,11 +8,12 @@ import {Document} from './document.model';
 import {FollowThrough} from './follow-through.model';
 import {FriendshipThrough} from './friendship-through.model';
 import {LikeThrough} from './like-through.model';
+import {Password} from './password.model';
 import {Photo} from './photo.model';
 import {Post} from './post.model';
 import {School} from './school.model';
-import {Video} from './video.model';
 import {UserConfig} from './user-config.model';
+import {Video} from './video.model';
 
 @model()
 export class User extends Entity {
@@ -42,15 +43,15 @@ export class User extends Entity {
   })
   phone: string;
 
-  @property({
-    type: 'string',
-    required: true,
-    jsonSchema: {
-      maxLength: 20,
-      minLength: 5,
-    },
-  })
-  password: string | undefined;
+  // @property({
+  //   type: 'string',
+  //   required: true,
+  //   jsonSchema: {
+  //     maxLength: 20,
+  //     minLength: 5,
+  //   },
+  // })
+  // password: string | undefined;
 
 
   @property({
@@ -68,7 +69,7 @@ export class User extends Entity {
     required: true,
     jsonSchema: {
       maxLength: 50,
-      minLength: 1,
+      minLength: 0,
     },
   })
   lastName: string;
@@ -79,7 +80,7 @@ export class User extends Entity {
     type: 'string',
     jsonSchema: {
       maxLength: 50,
-      minLength: 1,
+      minLength: 0,
     },
   })
   otherName?: string;
@@ -131,6 +132,7 @@ export class User extends Entity {
   })
   remember?: boolean;
 
+  //Relation property
 
   @hasOne(() => Post)
   post: Post;
@@ -153,6 +155,9 @@ export class User extends Entity {
 
   @hasMany(() => Document)
   documents: Document[];
+
+  @hasOne(() => Password)
+  password: Password;
 
   @hasMany(() => Comment, {keyTo: 'initiatorId'})
   comments: Comment[];
@@ -198,7 +203,14 @@ export class User extends Entity {
 
   @hasMany(() => UserConfig)
   userConfigs: UserConfig[];
-  //Relation property
+
+  // @hasMany(() => ResetRequest)
+  // resetRequests: ResetRequest[];
+
+  // @hasMany(() => Authentication)
+  // authentications: Authentication[];
+
+  [prop: string]: any;
 
   constructor(data?: Partial<User>) {
     super(data);

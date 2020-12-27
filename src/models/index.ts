@@ -30,3 +30,6 @@ export * from './push-message.model';
 export * from './push-topic.model';
 export * from './device.model';
 export * from './device-topic-through.model';
+export * from './reset-request.model';
+export * from './authentication.model';
+export * from './password.model';

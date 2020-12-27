@@ -43,7 +43,6 @@ export class SchoolUserController {
   ): Promise<User[]> {
     const users = await this.schoolRepository.users(id).find(filter);
     return users.map(user => {
-      delete user.password;
       return user;
     });
   }
@@ -143,9 +142,7 @@ export class SchoolUserController {
     filter.where = filter.where ?? {};
     (filter.where as any).id = {inq: usersIds}
     const users = await this.userRepository.find(filter);
-    users.map(user => {
-      delete user.password;
-    })
+
     return users;
   }
 

@@ -40,9 +40,6 @@ export class CommentUserController {
     @param.query.object('filter') filter?: Filter<User>,
   ): Promise<User[]> {
     const users = await this.commentRepository.likedUsers(id).find(filter);
-    users.map(user => {
-      delete user.password;
-    })
     return users;
   }
 

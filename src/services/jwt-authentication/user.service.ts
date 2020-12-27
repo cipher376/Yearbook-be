@@ -5,6 +5,7 @@ import {HttpErrors} from '@loopback/rest';
 import {securityId, UserProfile} from '@loopback/security';
 import {PasswordHasherBindings} from '../../keys';
 import {User} from '../../models';
+import {PasswordRepository} from '../../repositories';
 import {UserRepository} from '../../repositories/user.repository';
 import {BcryptHasher} from '../hash.password';
 
@@ -19,6 +20,9 @@ export type Credentials = {
 export class MyUserService implements UserService<User, Credentials>{
     @repository(UserRepository)
     public userRepository: UserRepository;
+
+    @repository(PasswordRepository)
+    public passwordRepository: PasswordRepository;
 
     // @inject('service.hasher')
     @inject(PasswordHasherBindings.PASSWORD_HASHER)
@@ -38,7 +42,9 @@ export class MyUserService implements UserService<User, Credentials>{
         if (!foundUser) {
             throw new HttpErrors.NotFound('user not found');
         }
-        const passwordMatched = await this.hasher.comparePassword(credentials.password as string, foundUser.password as string)
+        // get user password hash
+        const password = await this.passwordRepository.findOne({where: {userId: foundUser.id}});
+        const passwordMatched = await this.hasher.comparePassword(credentials.password as string, password?.hash as any)
         if (!passwordMatched)
             throw new HttpErrors.Unauthorized('password is not valid');
         return foundUser;
@@ -62,7 +68,6 @@ export class MyUserService implements UserService<User, Credentials>{
     convertToUserView(user: User): User {
         // remove sensitive data
         user.realm = undefined;
-        user.password = undefined;
         user.remember = undefined;
         user.emailVerified = undefined;
         user.verificationToken = undefined;
