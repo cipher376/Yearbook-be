@@ -1,2 +1,3 @@
 # Yearbook-be
-Backend for yearbook application
+
+Backend for almamater application

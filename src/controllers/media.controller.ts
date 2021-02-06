@@ -271,7 +271,7 @@ export class MediaController {
           console.log(file.path);
           createVideoThumbnail(file.path, file.destination + "\\thumb_" + fileName).then(_ => {
             // console.log('Video thumb created');
-            createVideoPoster(file.path, file.destination + "\\poster_" + fileName).then(_ => {
+            createVideoPoster(file.path, file.destination + "\\poster_" + fileName).then(a => {
               // console.log('Poster created');
             }, error => {
               console.log(error);
@@ -285,7 +285,7 @@ export class MediaController {
           resizeImage(file.path, 1000).then(_ => {
             console.log('resize complete')
             if (createThumb) {
-              createImageThumbnail(file.path, file?.destination + "\\thumb_" + file.filename).then(_ => {
+              createImageThumbnail(file.path, file?.destination + "\\thumb_" + file.filename).then(t => {
                 // console.log('Thumbnail created');
               }, error => {
                 console.log(error);

@@ -118,7 +118,7 @@ export class UserController {
     const savedUser = await this.userRepository.create(user);
 
 
-    let password = {
+    const password = {
       hash,
       dateCreated: (new Date(Date.now())).toDateString(),
       dateModified: (new Date(Date.now())).toDateString(),
@@ -626,7 +626,7 @@ export class UserController {
         const savedUser = await this.userRepository.create(user);
 
         // save password hash
-        let password = {
+        const password = {
           hash,
           dateCreated: (new Date(Date.now())).toDateString(),
           dateModified: (new Date(Date.now())).toDateString(),
@@ -709,7 +709,7 @@ export class UserController {
       // console.log(now);
 
       // calculate the elapsed time in minutes
-      var diff = (now.getTime() - startTime.getTime()) / 1000;
+      let diff = (now.getTime() - startTime.getTime()) / 1000;
       diff /= 60;
       const elapsedTime = Math.abs(Math.round(diff)) // time in minutes
       // console.log(elapsedTime);
@@ -793,11 +793,11 @@ export class UserController {
       reset.state = OPERATION_STATE.pending;
       reset = await this.resetRequestRepository.create(reset);
       console.log(reset);
-      const resetUrl = `http://localhost:4401/change-password/${token}`;
+      const resetUrl = `http://almamater.devtek-limited.tech/change-password/${token}`;
       // send reset link to email
       const resetEmail: EmailMessage = {
         from: "antiamoah890@gmail.com",
-        to: "ntiamoah376@yahoo.com", //"bar@example.com, baz@example.com"
+        to: data.email, //"bar@example.com, baz@example.com"
         subject: 'Password reset link',
         text: `Copy this link and paste in your browser: ${resetUrl}`,
         html: `<div><a href="${resetUrl}" target="_">Reset password</a></div>
@@ -1019,7 +1019,7 @@ export class UserController {
             <td bgcolor="#FFC0B3" align="center"
               style="padding: 30px 30px 30px 30px; border-radius: 4px 4px 4px 4px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;">
               <h2 style="font-size: 20px; font-weight: 400; color: #111111; margin: 0;">Need more help?</h2>
-              <p style="margin: 0;"><a href="http://localhost:4401/help" target="_blank"
+              <p style="margin: 0;"><a href="http://almamater.devtek-limited.tech/help" target="_blank"
                   style="color: #E62A00;">We&rsquo;re
                   here, ready to talk</a></p>
             </td>
@@ -1038,7 +1038,7 @@ export class UserController {
             <td bgcolor="#f4f4f4" align="left"
               style="padding: 10px 30px 30px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; line-height: 18px;">
               <p style="margin: 0;">You received this email because you requested a password reset. If you did not, <a
-                  href="http://localhost:4401/help" target="_blank" style="color: #111111; font-weight:
+                  href="http://almamater.devtek-limited.tech/help" target="_blank" style="color: #111111; font-weight:
                   700;">please contact us or ignore.</a>.</p>
             </td>
           </tr>

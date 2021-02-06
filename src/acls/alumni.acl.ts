@@ -50,7 +50,7 @@ export const ACL_ALUMNI = {
   'delete-by-user-school-id': {
     resource: RESOURCE_NAME,
     scopes: ['delete-by-user-school-id'],
-    allowedRoles: ['admin'],
+    allowedRoles: ['authUser'],
     voters: [assignInstanceId],
   }
 };

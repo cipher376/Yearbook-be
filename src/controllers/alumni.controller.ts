@@ -1,5 +1,6 @@
-import {authenticate} from '@loopback/authentication';
+import {authenticate, AuthenticationBindings} from '@loopback/authentication';
 import {authorize} from '@loopback/authorization';
+import {inject} from '@loopback/core';
 import {
   Count,
   CountSchema,
@@ -27,6 +28,7 @@ import {
 
   requestBody
 } from '@loopback/rest';
+import {UserProfile} from '@loopback/security';
 import {ACL_ALUMNI} from '../acls/alumni.acl';
 import {Alumni, SchoolDetails} from '../models';
 import {AlumniRepository, SchoolDetailsRepository, SchoolRepository, UserRepository} from '../repositories';
@@ -279,13 +281,18 @@ export class AlumniController {
   @authenticate("jwt")
   @authorize(ACL_ALUMNI['delete-by-user-school-id'])
   async deleteByUserSchoolId(
+    @inject(AuthenticationBindings.CURRENT_USER)
+    currentUser: UserProfile,
     @param.path.number('userId') userId: number,
     @param.path.number('schoolId') schoolId: number
   ): Promise<void> {
     if (userId && schoolId) {
-      const filter: Where<Alumni> = {and: [{userId}, {schoolId}]} as any
-      console.log(filter);
-      await this.alumniRepository.deleteAll(filter);
+      if (userId === currentUser?.id) {
+        const filter: Where<Alumni> = {and: [{userId}, {schoolId}]} as any
+        console.log(filter);
+        await this.alumniRepository.deleteAll(filter);
+      }
+
     }
   }
 }
