@@ -142,21 +142,25 @@ export class SchoolController {
   ): Promise<School[]> {
 
     let schools: School[] = await this.schoolRepository.find({
-      include: [{
-        relation: 'address',
-      },
-      {
-        relation: 'photos',
-        scope: {
-          where: {
-            or: [{profile: true}, {flag: true}, {coverImage: true}]
+      include: [
+        {
+          relation: 'address',
+        },
+        {
+          relation: 'photos',
+          scope: {
+            where: {
+              or: [{profile: true}, {flag: true}, {coverImage: true}]
+            }
           }
+        },
+        {
+          relation: 'schoolDetails'
         }
-      },
-      {
-        relation: 'schoolDetails'
-      }]
+      ]
     });
+
+    console.log(schools);
 
     if (searchKey === 'all') {
       return applyFilter(schools, filter);

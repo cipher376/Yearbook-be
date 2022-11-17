@@ -102,30 +102,44 @@ export class PostController {
     const posts = await this.postRepository.find(filter);
     // load through relations
     for (const post of posts) {
-      if (!post.photos) {
-        post.photos = [];
+      try {
+        if (!post.photos) {
+          post.photos = [];
+        }
+        post.photos = post.photos.concat(await this.postRepository.photosThrough(post.id).find())
+      } catch (error) {
+        console.log(error);
       }
-      post.photos = post.photos.concat(await this.postRepository.photosThrough(post.id).find())
 
 
-      if (!post.audios) {
-        post.audios = [];
+      try {
+        if (!post.audios) {
+          post.audios = [];
+        }
+        post.audios = post.audios.concat(await this.postRepository.audioThrough(post.id).find())
+      } catch (error) {
+        console.log(error)
       }
-      post.audios = post.audios.concat(await this.postRepository.audioThrough(post.id).find())
 
-
-      if (!post.videos) {
-        post.videos = [];
+      try {
+        if (!post.videos) {
+          post.videos = [];
+        }
+        post.videos = post.videos.concat(await this.postRepository.videosThrough(post.id).find())
+      } catch (error) {
+        console.log(error)
       }
-      post.videos = post.videos.concat(await this.postRepository.videosThrough(post.id).find())
 
 
-      if (!post.documents) {
-        post.documents = [];
+      try {
+        if (!post.documents) {
+          post.documents = [];
+        }
+        post.documents = post.documents.concat(await this.postRepository.documentsThrough(post.id).find())
+
+      } catch (error) {
+        console.log(error)
       }
-      post.documents = post.documents.concat(await this.postRepository.documentsThrough(post.id).find())
-
-
     }
     console.log();
     // })

@@ -22,7 +22,7 @@ import {MyMailer} from './services/mailing/nodemail.service';
 import {MYSocketIoApplication} from './services/push-notifiication/socket-pusher.application';
 import {MySocketPushService, SocketPusherBindings} from './services/push-notifiication/socket-pusher.service';
 
-const PubNub = require('pubnub');
+// const PubNub = require('pubnub');
 
 
 
@@ -94,7 +94,6 @@ export class YearbookBeApplication extends BootMixin(
 
 
   setupBinding(): void {
-
     this.bind(PasswordHasherBindings.PASSWORD_HASHER).toClass(BcryptHasher).inScope(BindingScope.SERVER);
     this.bind(PasswordHasherBindings.ROUNDS).to(10).inScope(BindingScope.SERVER)
     this.bind(UserServiceBindings.USER_SERVICE).toClass(MyUserService).inScope(BindingScope.SERVER);
@@ -110,24 +109,6 @@ export class YearbookBeApplication extends BootMixin(
       sendToMultipleReceivers: false,
       senderEmail: 'antiamoah890@gmail.com'
     });
-
-    // this.bind(NodemailerBindings.Config).to(
-    //   {
-    //     host: "smtp.gmail.com",
-    //     port: 587, //465,
-    //     secure: false, // false ->> upgrade later with STARTTLS, true ->> tls
-    //     auth: {
-    //       user: "antiamoah890@gmail.com",
-    //       pass: "#Achiah376@G"
-    //     },
-    //     tls: {
-    //       // do not fail on invalid certs
-    //       rejectUnauthorized: false
-    //     }
-    //   }
-    // );
-    // this.bind(NotificationBindings.EmailProvider).toProvider(NodemailerProvider);
-
   }
 
 

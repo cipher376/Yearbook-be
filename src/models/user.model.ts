@@ -210,7 +210,7 @@ export class User extends Entity {
   // @hasMany(() => Authentication)
   // authentications: Authentication[];
 
-  [prop: string]: any;
+  [prop: string]: unknown;
 
   constructor(data?: Partial<User>) {
     super(data);

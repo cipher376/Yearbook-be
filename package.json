@@ -1,7 +1,7 @@
 {
   "name": "almamater-be",
   "version": "1.0.0",
-  "description": "Backend api for the Alma-mata project by Devtek",
+  "description": "Backend api for the Alma-mater project by Devtek",
   "keywords": [
     "loopback-application",
     "loopback"

@@ -3,6 +3,7 @@ import {ApplicationConfig} from '.';
 
 const originsWhitelist = [
   'http://localhost:8100',      //this is my front-end url for development
+  'http://localhost',      //this is my front-end url for development
   'http://localhost:42001',      //this is my front-end url for development
   'http://www.devtek-limited.com',
   'http://www.devtek-limited.tech',
@@ -10,6 +11,7 @@ const originsWhitelist = [
   'https://localhost:8100',      //this is my front-end url for development
   'https://www.devtek-limited.com',
   'https://www.devtek-limited.tech',
+  'https://localhost',      //this is my front-end url for development
   'https://yearbook-api.devtek-limited.tech',
   '*'
 ];
